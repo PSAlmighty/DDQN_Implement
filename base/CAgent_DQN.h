@@ -95,7 +95,7 @@ private:
 	void *AG_ZMQ_Context;
 	void *AG_ZMQ_Responder;
 
-	Agent_Info ptAgInfo;
+	Agent_Info ptAG_Info;
 	MD_Info ptMD_Info;
 
 	pthread_mutex_t csInstrumentInternalLock;

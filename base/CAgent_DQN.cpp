@@ -152,13 +152,13 @@ void CAgent::DQN_Action(CThostFtdcDepthMarketDataField * DepthData)
 		CloseOffSetFlag = THOST_FTDC_OF_Close;
 
 
-	ptAgInfo.set_agent_action(88);
+	ptAG_Info.set_agent_action(88);
 
 	int i = 1;
 	//while(1){
-	//ptAgInfo.set_agent_action(i++);
+	//ptAG_Info.set_agent_action(i++);
 	//string proto_buffer;
-	//ptAgInfo.SerializeToString(&proto_buffer);
+	//ptAG_Info.SerializeToString(&proto_buffer);
 
 	//printf("waiting\n");
 
@@ -168,8 +168,8 @@ void CAgent::DQN_Action(CThostFtdcDepthMarketDataField * DepthData)
 	//char buff[100];
 	//memset(buff,0,100*sizeof(char));
 	//memcpy(buff,zmq_msg_data(&request),100);
-	//ptAgInfo.ParseFromArray(buff,100);
-	//cerr<<"Agent Action: "<<ptAgInfo.agent_action()<<endl;
+	//ptAG_Info.ParseFromArray(buff,100);
+	//cerr<<"Agent Action: "<<ptAG_Info.agent_action()<<endl;
 	//memset(buff,0,100*sizeof(char));
 
 	//zmq_msg_t reply;
@@ -377,6 +377,41 @@ void CAgent::Start_MD_ZMQ_Server(){
 	ptMD_Info.ParseFromArray(buff,100);
 	if(ptMD_Info.msg_received() == false){
 		bMD_PyReady = true;
+	}
+
+	//int reply_size = proto_buffer.size();
+	//int ret = zmq_msg_init_size(&reply,100);
+	//memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
+	//zmq_msg_send(&reply,ZMQ_Responder,0);
+
+	//zmq_close(ZMQ_Responder);
+	//zmq_ctx_destroy(ZMQ_Context);
+}
+
+void CAgent::Start_AG_ZMQ_Server(){
+	AG_ZMQ_Context = zmq_ctx_new();
+	AG_ZMQ_Responder = zmq_socket(AG_ZMQ_Context, ZMQ_REP);
+	string IPC_pipe_name = "ipc:///tmp/md" + instrument_md_pipe_name;
+	cerr<<IPC_pipe_name<<endl;
+	int rc = zmq_bind(AG_ZMQ_Responder, IPC_pipe_name.c_str());
+	assert(rc == 0);
+
+	// need set the machinesm well in this section
+	char buff[100];
+	zmq_msg_t request;
+	zmq_msg_t reply;
+
+	string proto_buffer;
+
+	printf("waiting PyAG required\n");
+
+	zmq_msg_init_size(&request,100);
+	int size = zmq_msg_recv(&request,AG_ZMQ_Responder,0);
+	memset(buff,0,100 * sizeof(char));
+	memcpy(buff,zmq_msg_data(&request),100);
+	ptAG_Info.ParseFromArray(buff,100);
+	if(ptAG_Info.msg_received() == false){
+		bAG_PyReady = true;
 	}
 
 	//int reply_size = proto_buffer.size();
