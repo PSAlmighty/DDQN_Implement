@@ -1,0 +1,8 @@
+syntax = "proto3";
+message Agent_Info{
+	fixed32 Agent_Action = 1;
+	fixed32 Current_Position = 2;
+	string Agent_Trading_Instrument = 3;
+	string Action_Timestamp = 4;
+	bool LatestResult = 5;
+}
