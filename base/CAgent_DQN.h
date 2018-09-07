@@ -27,12 +27,10 @@ class CAgent
 {
 public:
 
-	CAgent();
+	CAgent(string,string);
 	~CAgent();
 
 	void Start_ZMQ_Server();
-
-	void SetInstrumentID(char*);
 
 	void SliceThreadPool(CThostFtdcDepthMarketDataField *DepthData);
 	void DeleteLimitOrderFilled(double, string, char, int);
@@ -47,6 +45,7 @@ public:
 	void ResetOrderDoneFlag(string&,char);
 
 	//static void NTAPI SliceCallBack(PTP_CALLBACK_INSTANCE pInstance, PVOID pvContext);
+	//Kernel data dueling
 	static void *SliceCallBack(void *pvContext);
 
 	string InstrumentExchangeID;
@@ -85,6 +84,7 @@ private:
 	depth_struct DepthAB;
 
 	string InstrumentID;
+	string instrument_pipe_name;
 	string TradingDATE;
 	string TradingTIME;
 	string Previous_Action_Timestamp;

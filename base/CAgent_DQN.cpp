@@ -38,8 +38,11 @@ extern bool ORDER_OVER_POSITION;
 
 //void *SliceCallBack(void *pvContext);
 
-CAgent::CAgent(){
+CAgent::CAgent(string _ID,string _pipe_name){
 	memset(Timer, 0, sizeof(Timer));
+
+	InstrumentID = _ID;
+	instrument_pipe_name = _pipe_name;
 
 	bLongOrderFilled = true;
 	bShortOrderFilled = true;
@@ -156,6 +159,7 @@ void *CAgent::SliceCallBack(void *arg){
 		&& !pThis->bStopTrading){
 		//pThis->CheckLimitOrderQuene(false);
 		//pThis->DQN_Action(pThis->SprDepthData);
+		cerr<<"Heartbeat Working\n";
 	}
 	else{
 		pThis->CleanPosition(pThis->SprDepthData);
@@ -396,10 +400,6 @@ void CAgent::PullOrderBack(double price){
 	pthread_mutex_unlock(&csInstrumentUnfillOrderLock);
 }
 
-void CAgent::SetInstrumentID(char *ID){
-	InstrumentID = ID;
-}
-
 void CAgent::SetPositionStatus(CThostFtdcTradeField * pTrade){
 	//Output
 	string OffSetFlag, Direction, Date, OrderSysID;
@@ -600,7 +600,9 @@ string CAgent::GetTimer(){
 void CAgent::Start_ZMQ_Server(){
 	ZMQ_Context = zmq_ctx_new();
 	ZMQ_Responder = zmq_socket(ZMQ_Context, ZMQ_REP);
-	int rc = zmq_bind(ZMQ_Responder, "ipc:///tmp/dqnagent");
+	string IPC_pipe_name = "ipc:///tmp/" + instrument_pipe_name;
+	cerr<<IPC_pipe_name<<endl;
+	int rc = zmq_bind(ZMQ_Responder, IPC_pipe_name.c_str());
 	assert(rc == 0);
 
 	// need set the machinesm well in this section

@@ -29,11 +29,6 @@ CTraderSpi *pTraderSpi = new CTraderSpi();
 CThread_Pool *_ThreadPool;
 
 
-char  SIM_M_FRONT_ADDR[] = "tcp://115.238.108.173:51213";
-char  SIM_T_FRONT_ADDR[] = "tcp://115.238.108.173:51205";		// 前置地址Sim
-//char  SIM_M_FRONT_ADDR[] = "tcp://113.106.89.18:41213";
-//char  SIM_T_FRONT_ADDR[] = "tcp://113.106.89.18:40905";		// 前置地址Sim
-
 char  LIVE_M_FRONT_ADDR[] = "tcp://211.144.195.157 :41213";
 //char  LIVE_M_FRONT_ADDR[] = "tcp://101.95.8.178 :51213";
 char  LIVE_T_FRONT_ADDR[] = "tcp://211.144.195.157 :41205";	// 前置地址Live
@@ -44,8 +39,6 @@ ThostFtdcParams Citic_Thost_Params;
 // 交易品种数组
 char **ppInstrumentID;
 int iInstrumentID;
-
-// 前置地址
 
 
 //交易品种文件路径
@@ -64,9 +57,8 @@ queue<CThostFtdcInputOrderActionField> qCancelOrderQueue;
 // 交易品种默认交易量
 map<string, CAgent*> mpMM;
 map<string, int> mpInstrumentClipSize;
-map<string, double> mpInstrumentDefaultSpread;
-map<string, double> mpInstrumentDefaultDeflator;
 map<string, double> mpInstrumentDailyStopLimit;
+map<string, string> mpInstrumentPipeName;
 
 pthread_mutex_t csOperatingOrderSysID;
 pthread_mutex_t csInsert;
@@ -86,9 +78,9 @@ int iRequestID = 0;
 int PULL_ORDER_LIMIT;
 
 
-void *Trading(void *lpParammeter);                   //交易回报线程
-void *MarketData(void *lpParameter);                //市场数据线程 
-void *InsertOrderThread(void *lpParameter);         //订单发送处理线程
+void *Trading(void *lpParammeter);                 //交易回报线程
+void *MarketData(void *lpParameter);               //市场数据线程 
+void *InsertOrderThread(void *lpParameter);        //订单发送处理线程
 void *CancelOrderThread(void *lpParameter);        //撤单发送处理线程
 
 
@@ -99,9 +91,8 @@ int main(int argc, char *argv[]){
 
 	mpMM.clear();
 	mpInstrumentClipSize.clear();	
-	mpInstrumentDefaultSpread.clear();
-	mpInstrumentDefaultDeflator.clear();
 	mpInstrumentDailyStopLimit.clear();
+	mpInstrumentPipeName.clear();
 	
 	//第二参数FALSE 事件触发后将自动复位
 	pthread_cond_init(&hRtnDepMktOutPut, NULL);
@@ -148,8 +139,7 @@ int main(int argc, char *argv[]){
 	else
 	{
 		ppInstrumentID = (char**)malloc(sizeof(char*) * 20);
-		while (fgets(InputBuff, 100, fp) != NULL)
-		{
+		while (fgets(InputBuff, 100, fp) != NULL){
 			string tempStr = InputBuff;
 			string Substr;
 
@@ -160,7 +150,7 @@ int main(int argc, char *argv[]){
 				Substr = tempStr.substr(0, pos);
 			else
 			{
-				printf("No clip size\n");
+				printf("No ClipSize\n");
 				system("PAUSE");
 				exit(0);
 			}
@@ -177,7 +167,7 @@ int main(int argc, char *argv[]){
 				Substr = tempStr.substr(0, pos);
 			else
 			{
-				printf("No Default Spread\n");
+				printf("No StopLimit\n");
 				system("PAUSE");
 				exit(0);
 			}
@@ -186,31 +176,18 @@ int main(int argc, char *argv[]){
 
 			pos = tempStr.find(",");
 			if (pos != -1)
-				//defalut_spread
+				//Daily_stop_limit
 				Substr = tempStr.substr(0, pos);
 			else
 			{
-				printf("No Default Deflator\n");
+				printf("No Pipe_name\n");
 				system("PAUSE");
 				exit(0);
 			}
-			mpInstrumentDefaultSpread[ppInstrumentID[iInstrumentID]] = atof(Substr.c_str());
-			tempStr.erase(0, pos + 1);
-
-			pos = tempStr.find(",");
-			if (pos != -1)
-				//spread_deflator
-				Substr = tempStr.substr(0, pos);
-			else
-			{
-				printf("No DailyStopLimit\n");
-				system("PAUSE");
-				exit(0);
-			}
-			mpInstrumentDefaultDeflator[ppInstrumentID[iInstrumentID]] = atof(tempStr.c_str());
-			tempStr.erase(0, pos + 1);
-
 			mpInstrumentDailyStopLimit[ppInstrumentID[iInstrumentID]] = atof(tempStr.c_str());
+			tempStr.erase(0, pos + 1);
+
+			mpInstrumentPipeName[ppInstrumentID[iInstrumentID]] = tempStr.c_str();
 			iInstrumentID++;
 		}
 		fclose(fp);
@@ -233,16 +210,22 @@ int main(int argc, char *argv[]){
 	//if(pthread_create(&hThreadTrader,NULL, Trading, NULL))
 	//	printf("Failed create Trader Thread\n");
 	//pthread_mutex_lock(&csMainThreadLock);
-	////WaitForSingleObject(hTradingThreadDone, INFINITE);
 	//pthread_cond_wait(&hTradingThreadDone,&csMainThreadLock);
 	//pthread_mutex_unlock(&csMainThreadLock);
 
-	//Initialize mpMM
+	//Initialize mpAgent
 	for (int i = 0; i < iInstrumentID; i++){
-		mpMM[ppInstrumentID[i]] = new CAgent();
-		mpMM[ppInstrumentID[i]]->SetInstrumentID(ppInstrumentID[i]);
+		cerr<<" ID "<<ppInstrumentID[i]<<endl;
+		cerr<<" ClipSize "<<mpInstrumentClipSize[ppInstrumentID[i]]<<endl;
+		cerr<<" StopLimit "<<mpInstrumentDailyStopLimit[ppInstrumentID[i]]<<endl;
+		cerr<<" Pipe_name "<<mpInstrumentPipeName[ppInstrumentID[i]]<<endl;
+	}
+
+	for (int i = 0; i < iInstrumentID; i++){
+		mpMM[ppInstrumentID[i]] = new CAgent(ppInstrumentID[i],mpInstrumentPipeName[ppInstrumentID[i]]);
 	}
 	sleep(5);
+
 	//SetEvent(hInstrumentSetupDone);
 	pthread_mutex_lock(&csMainThreadLock);
 	pthread_cond_signal(&hInstrumentSetupDone);
