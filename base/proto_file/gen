@@ -1,8 +1,7 @@
 #!/bin/bash
 
 protoc --cpp_out=. DQN_Agent.proto
-protoc --cpp_out=. ctp_data_msg.proto
 protoc --python_out=. DQN_Agent.proto
 
 mv *.pb.* ..
-mv *.py /AI/CTP_E/torch_model
+mv *.py /AI/CTP_E/Py_Opponent/torch_mod

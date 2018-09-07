@@ -30,7 +30,7 @@ CThread_Pool *_ThreadPool;
 
 
 char  LIVE_M_FRONT_ADDR[] = "tcp://211.144.195.157 :41213";
-char  LIVE_T_FRONT_ADDR[] = "tcp://apcitapps01 :41205";		// 前置地址Live
+char  LIVE_T_FRONT_ADDR[] = "tcp://172.31.10.142 :41205";		// 前置地址Live
 
 ThostFtdcParams Citic_Thost_Params;
 
@@ -56,7 +56,8 @@ queue<CThostFtdcInputOrderActionField> qCancelOrderQueue;
 map<string, CAgent*> mpMM;
 map<string, int> mpInstrumentClipSize;
 map<string, double> mpInstrumentDailyStopLimit;
-map<string, string> mpInstrumentPipeName;
+map<string, string> mpInstrumentMDPipeName;
+map<string, string> mpInstrumentAGPipeName;
 
 pthread_mutex_t csOperatingOrderSysID;
 pthread_mutex_t csInsert;
@@ -90,7 +91,8 @@ int main(int argc, char *argv[]){
 	mpMM.clear();
 	mpInstrumentClipSize.clear();	
 	mpInstrumentDailyStopLimit.clear();
-	mpInstrumentPipeName.clear();
+	mpInstrumentMDPipeName.clear();
+	mpInstrumentAGPipeName.clear();
 	
 	//第二参数FALSE 事件触发后将自动复位
 	pthread_cond_init(&hRtnDepMktOutPut, NULL);
@@ -178,14 +180,27 @@ int main(int argc, char *argv[]){
 				Substr = tempStr.substr(0, pos);
 			else
 			{
-				printf("No Pipe_name\n");
+				printf("No MD_Pipe_name\n");
 				system("PAUSE");
 				exit(0);
 			}
-			mpInstrumentDailyStopLimit[ppInstrumentID[iInstrumentID]] = atof(tempStr.c_str());
+			mpInstrumentDailyStopLimit[ppInstrumentID[iInstrumentID]] = atof(Substr.c_str());
 			tempStr.erase(0, pos + 1);
 
-			mpInstrumentPipeName[ppInstrumentID[iInstrumentID]] = tempStr.c_str();
+			pos = tempStr.find(",");
+			if (pos != -1)
+				//MD_PipeName
+				Substr = tempStr.substr(0, pos);
+			else
+			{
+				printf("No AGENT_Pipe_name\n");
+				system("PAUSE");
+				exit(0);
+			}
+			mpInstrumentMDPipeName[ppInstrumentID[iInstrumentID]] = Substr.c_str();
+			tempStr.erase(0, pos + 1);
+
+			mpInstrumentAGPipeName[ppInstrumentID[iInstrumentID]] = tempStr.c_str();
 			iInstrumentID++;
 		}
 		fclose(fp);
@@ -216,11 +231,14 @@ int main(int argc, char *argv[]){
 		cerr<<" ID "<<ppInstrumentID[i]<<endl;
 		cerr<<" ClipSize "<<mpInstrumentClipSize[ppInstrumentID[i]]<<endl;
 		cerr<<" StopLimit "<<mpInstrumentDailyStopLimit[ppInstrumentID[i]]<<endl;
-		cerr<<" Pipe_name "<<mpInstrumentPipeName[ppInstrumentID[i]]<<endl;
+		cerr<<" Pipe_name "<<mpInstrumentMDPipeName[ppInstrumentID[i]]<<endl;
+		cerr<<" Pipe_name "<<mpInstrumentAGPipeName[ppInstrumentID[i]]<<endl;
 	}
 
 	for (int i = 0; i < iInstrumentID; i++){
-		mpMM[ppInstrumentID[i]] = new CAgent(ppInstrumentID[i],mpInstrumentPipeName[ppInstrumentID[i]]);
+		mpMM[ppInstrumentID[i]] = new CAgent(ppInstrumentID[i],
+				mpInstrumentMDPipeName[ppInstrumentID[i]],
+				mpInstrumentAGPipeName[ppInstrumentID[i]]);
 	}
 	sleep(5);
 

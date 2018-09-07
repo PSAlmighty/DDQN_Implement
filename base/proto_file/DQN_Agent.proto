@@ -5,4 +5,11 @@ message Agent_Info{
 	string Agent_Trading_Instrument = 3;
 	string Action_Timestamp = 4;
 	bool LatestResult = 5;
-}
+	bool msg_received = 6;
+};
+
+message MD_Info{
+	double last_price = 1;
+	fixed32 volume = 2;
+	bool msg_received = 3;
+};

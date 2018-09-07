@@ -38,11 +38,12 @@ extern bool ORDER_OVER_POSITION;
 
 //void *SliceCallBack(void *pvContext);
 
-CAgent::CAgent(string _ID,string _pipe_name){
+CAgent::CAgent(string _ID,string _md_pipe_name,string _ag_pipe_name){
 	memset(Timer, 0, sizeof(Timer));
 
 	InstrumentID = _ID;
-	instrument_pipe_name = _pipe_name;
+	instrument_md_pipe_name = _md_pipe_name;
+	instrument_ag_pipe_name = _ag_pipe_name;
 
 	Hours = 0;
 	Minutes = 0;
@@ -53,6 +54,8 @@ CAgent::CAgent(string _ID,string _pipe_name){
 
 	bMktClosing = false;
 	bStopTrading = false;
+	bMD_PyReady = false;
+	bAG_PyReady = false;
 
 	Posi.mp_PriceMap.clear();
 	Posi.NetPosition = 0;
@@ -67,7 +70,7 @@ CAgent::CAgent(string _ID,string _pipe_name){
 	pthread_mutex_init(&csInstrumentUnfillFlagLock,NULL);
 	pthread_mutex_init(&csInstrumentUnfillOrderLock,NULL);
 
-//	Start_ZMQ_Server();
+	Start_MD_ZMQ_Server();
 }
 
 CAgent::~CAgent(){
@@ -128,6 +131,8 @@ void *CAgent::SliceCallBack(void *arg){
 		//pThis->DQN_Action(pThis->SprDepthData);
 		cerr<<"Heartbeat Working\n";
 		cerr<<pThis->SprDepthData->LastPrice<<endl;
+		if(pThis->bMD_PyReady)
+			pThis->Broadcast_MD(pThis->SprDepthData);
 	}
 
 	pThis->CalculatePnL(pThis->SprDepthData);
@@ -151,31 +156,31 @@ void CAgent::DQN_Action(CThostFtdcDepthMarketDataField * DepthData)
 
 	int i = 1;
 	//while(1){
-	ptAgInfo.set_agent_action(i++);
-	string proto_buffer;
-	ptAgInfo.SerializeToString(&proto_buffer);
+	//ptAgInfo.set_agent_action(i++);
+	//string proto_buffer;
+	//ptAgInfo.SerializeToString(&proto_buffer);
 
-	printf("waiting\n");
+	//printf("waiting\n");
 
-	zmq_msg_t request;
-	zmq_msg_init_size(&request,100);
-	int size = zmq_msg_recv(&request,ZMQ_Responder,0);
-	char buff[100];
-	memset(buff,0,100*sizeof(char));
-	memcpy(buff,zmq_msg_data(&request),100);
-	ptAgInfo.ParseFromArray(buff,100);
-	cerr<<"Agent Action: "<<ptAgInfo.agent_action()<<endl;
-	memset(buff,0,100*sizeof(char));
+	//zmq_msg_t request;
+	//zmq_msg_init_size(&request,100);
+	//int size = zmq_msg_recv(&request,ZMQ_Responder,0);
+	//char buff[100];
+	//memset(buff,0,100*sizeof(char));
+	//memcpy(buff,zmq_msg_data(&request),100);
+	//ptAgInfo.ParseFromArray(buff,100);
+	//cerr<<"Agent Action: "<<ptAgInfo.agent_action()<<endl;
+	//memset(buff,0,100*sizeof(char));
 
-	zmq_msg_t reply;
-	int reply_size = proto_buffer.size();
-	int ret = zmq_msg_init_size(&reply,100);
-	memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
-	zmq_msg_send(&reply,ZMQ_Responder,0);
+	//zmq_msg_t reply;
+	//int reply_size = proto_buffer.size();
+	//int ret = zmq_msg_init_size(&reply,100);
+	//memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
+	//zmq_msg_send(&reply,ZMQ_Responder,0);
 	//}
 
-	zmq_close(ZMQ_Responder);
-	zmq_ctx_destroy(ZMQ_Context);
+	//binzmq_close(ZMQ_Responder);
+	//zmq_ctx_destroy(ZMQ_Context);
 
 	pthread_mutex_unlock(&csInstrumentUnfillFlagLock);
 }
@@ -266,15 +271,13 @@ void CAgent::SetPositionStatus(CThostFtdcTradeField * pTrade){
 	else
 		Posi.mp_PriceMap[pTrade->Price] = Posi.mp_PriceMap[pTrade->Price] + tempLots;
 
-	for (map<double, int>::iterator mpit = Posi.mp_PriceMap.begin(); mpit != Posi.mp_PriceMap.end(); mpit++)
-	{
+	for (map<double, int>::iterator mpit = Posi.mp_PriceMap.begin(); mpit != Posi.mp_PriceMap.end(); mpit++){
 		//cerr <<Posi.InstrumentID << " " << mpit->first << " " << mpit->second<<endl;
 		tempTotalLots += mpit->second;
 	}
 	Posi.NetPosition = tempTotalLots;
 
-	if (pTrade->OffsetFlag == '0')
-	{
+	if (pTrade->OffsetFlag == '0'){
 		OffSetFlag = "OPEN";
 		//DiretionType is a char '0'=buy '1'=sell
 		//OffsetFlag is a char '0'=open '1'=close
@@ -350,54 +353,57 @@ string CAgent::GetTimer(){
 	return SprDepthData->UpdateTime;
 }
 
-void CAgent::Start_ZMQ_Server(){
-	ZMQ_Context = zmq_ctx_new();
-	ZMQ_Responder = zmq_socket(ZMQ_Context, ZMQ_REP);
-	string IPC_pipe_name = "ipc:///tmp/" + instrument_pipe_name;
+void CAgent::Start_MD_ZMQ_Server(){
+	MD_ZMQ_Context = zmq_ctx_new();
+	MD_ZMQ_Responder = zmq_socket(MD_ZMQ_Context, ZMQ_REP);
+	string IPC_pipe_name = "ipc:///tmp/md" + instrument_md_pipe_name;
 	cerr<<IPC_pipe_name<<endl;
-	int rc = zmq_bind(ZMQ_Responder, IPC_pipe_name.c_str());
+	int rc = zmq_bind(MD_ZMQ_Responder, IPC_pipe_name.c_str());
 	assert(rc == 0);
 
 	// need set the machinesm well in this section
-	int i = 1;
-	while(1){
-		char buff[100];
-		zmq_msg_t request;
-		zmq_msg_t reply;
+	char buff[100];
+	zmq_msg_t request;
+	zmq_msg_t reply;
 
-		ptAgInfo.set_agent_action(i++);
-		string proto_buffer;
-		ptAgInfo.SerializeToString(&proto_buffer);
+	string proto_buffer;
 
-		printf("waiting\n");
+	printf("waiting PyMD required\n");
 
-		zmq_msg_init_size(&request,100);
-		int size = zmq_msg_recv(&request,ZMQ_Responder,0);
-		memset(buff,0,100 * sizeof(char));
-		memcpy(buff,zmq_msg_data(&request),100);
-		ptAgInfo.ParseFromArray(buff,100);
-		cerr<<"InstrumentID: "<<ptAgInfo.agent_trading_instrument()<<endl;
-		cerr<<"Agent Action: "<<ptAgInfo.agent_action()<<endl;
-
-		//using strftime in PY to get the action timing and compare
-		if(Previous_Action_Timestamp != ptAgInfo.action_timestamp())
-			Previous_Action_Timestamp = ptAgInfo.action_timestamp();
-		else
-			cerr<<"Same Action \n";
-
-		cerr<<"Timestamp   : "<<ptAgInfo.action_timestamp()<<endl;
-
-		int reply_size = proto_buffer.size();
-		int ret = zmq_msg_init_size(&reply,100);
-		memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
-		zmq_msg_send(&reply,ZMQ_Responder,0);
+	zmq_msg_init_size(&request,100);
+	int size = zmq_msg_recv(&request,MD_ZMQ_Responder,0);
+	memset(buff,0,100 * sizeof(char));
+	memcpy(buff,zmq_msg_data(&request),100);
+	ptMD_Info.ParseFromArray(buff,100);
+	if(ptMD_Info.msg_received() == false){
+		bMD_PyReady = true;
 	}
 
-	zmq_close(ZMQ_Responder);
-	zmq_ctx_destroy(ZMQ_Context);
+	//int reply_size = proto_buffer.size();
+	//int ret = zmq_msg_init_size(&reply,100);
+	//memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
+	//zmq_msg_send(&reply,ZMQ_Responder,0);
+
+	//zmq_close(ZMQ_Responder);
+	//zmq_ctx_destroy(ZMQ_Context);
 }
 
+void CAgent::Broadcast_MD(CThostFtdcDepthMarketDataField *pDepth){
+	ptMD_Info.set_last_price(pDepth->LastPrice);
+	ptMD_Info.set_volume(pDepth->Volume);
 
+	char buff[100];
+	zmq_msg_t request;
+	zmq_msg_t reply;
+
+	string proto_buffer;
+	ptMD_Info.SerializeToString(&proto_buffer);
+	
+	int reply_size = proto_buffer.size();
+	int ret = zmq_msg_init_size(&reply,100);
+	memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
+	zmq_msg_send(&reply,MD_ZMQ_Responder,0);
+}
 
 
 

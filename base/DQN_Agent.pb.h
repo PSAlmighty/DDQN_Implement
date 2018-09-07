@@ -36,7 +36,7 @@ namespace protobuf_DQN_5fAgent_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[1];
+  static const ::google::protobuf::internal::ParseTable schema[2];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -44,13 +44,19 @@ struct TableStruct {
 void AddDescriptors();
 void InitDefaultsAgent_InfoImpl();
 void InitDefaultsAgent_Info();
+void InitDefaultsMD_InfoImpl();
+void InitDefaultsMD_Info();
 inline void InitDefaults() {
   InitDefaultsAgent_Info();
+  InitDefaultsMD_Info();
 }
 }  // namespace protobuf_DQN_5fAgent_2eproto
 class Agent_Info;
 class Agent_InfoDefaultTypeInternal;
 extern Agent_InfoDefaultTypeInternal _Agent_Info_default_instance_;
+class MD_Info;
+class MD_InfoDefaultTypeInternal;
+extern MD_InfoDefaultTypeInternal _MD_Info_default_instance_;
 
 // ===================================================================
 
@@ -182,6 +188,12 @@ class Agent_Info : public ::google::protobuf::Message /* @@protoc_insertion_poin
   bool latestresult() const;
   void set_latestresult(bool value);
 
+  // bool msg_received = 6;
+  void clear_msg_received();
+  static const int kMsgReceivedFieldNumber = 6;
+  bool msg_received() const;
+  void set_msg_received(bool value);
+
   // @@protoc_insertion_point(class_scope:Agent_Info)
  private:
 
@@ -191,9 +203,123 @@ class Agent_Info : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::uint32 agent_action_;
   ::google::protobuf::uint32 current_position_;
   bool latestresult_;
+  bool msg_received_;
   mutable int _cached_size_;
   friend struct ::protobuf_DQN_5fAgent_2eproto::TableStruct;
   friend void ::protobuf_DQN_5fAgent_2eproto::InitDefaultsAgent_InfoImpl();
+};
+// -------------------------------------------------------------------
+
+class MD_Info : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:MD_Info) */ {
+ public:
+  MD_Info();
+  virtual ~MD_Info();
+
+  MD_Info(const MD_Info& from);
+
+  inline MD_Info& operator=(const MD_Info& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  MD_Info(MD_Info&& from) noexcept
+    : MD_Info() {
+    *this = ::std::move(from);
+  }
+
+  inline MD_Info& operator=(MD_Info&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const MD_Info& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MD_Info* internal_default_instance() {
+    return reinterpret_cast<const MD_Info*>(
+               &_MD_Info_default_instance_);
+  }
+  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+    1;
+
+  void Swap(MD_Info* other);
+  friend void swap(MD_Info& a, MD_Info& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MD_Info* New() const PROTOBUF_FINAL { return New(NULL); }
+
+  MD_Info* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void CopyFrom(const MD_Info& from);
+  void MergeFrom(const MD_Info& from);
+  void Clear() PROTOBUF_FINAL;
+  bool IsInitialized() const PROTOBUF_FINAL;
+
+  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const PROTOBUF_FINAL;
+  void InternalSwap(MD_Info* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // double last_price = 1;
+  void clear_last_price();
+  static const int kLastPriceFieldNumber = 1;
+  double last_price() const;
+  void set_last_price(double value);
+
+  // fixed32 volume = 2;
+  void clear_volume();
+  static const int kVolumeFieldNumber = 2;
+  ::google::protobuf::uint32 volume() const;
+  void set_volume(::google::protobuf::uint32 value);
+
+  // bool msg_received = 3;
+  void clear_msg_received();
+  static const int kMsgReceivedFieldNumber = 3;
+  bool msg_received() const;
+  void set_msg_received(bool value);
+
+  // @@protoc_insertion_point(class_scope:MD_Info)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  double last_price_;
+  ::google::protobuf::uint32 volume_;
+  bool msg_received_;
+  mutable int _cached_size_;
+  friend struct ::protobuf_DQN_5fAgent_2eproto::TableStruct;
+  friend void ::protobuf_DQN_5fAgent_2eproto::InitDefaultsMD_InfoImpl();
 };
 // ===================================================================
 
@@ -354,9 +480,71 @@ inline void Agent_Info::set_latestresult(bool value) {
   // @@protoc_insertion_point(field_set:Agent_Info.LatestResult)
 }
 
+// bool msg_received = 6;
+inline void Agent_Info::clear_msg_received() {
+  msg_received_ = false;
+}
+inline bool Agent_Info::msg_received() const {
+  // @@protoc_insertion_point(field_get:Agent_Info.msg_received)
+  return msg_received_;
+}
+inline void Agent_Info::set_msg_received(bool value) {
+  
+  msg_received_ = value;
+  // @@protoc_insertion_point(field_set:Agent_Info.msg_received)
+}
+
+// -------------------------------------------------------------------
+
+// MD_Info
+
+// double last_price = 1;
+inline void MD_Info::clear_last_price() {
+  last_price_ = 0;
+}
+inline double MD_Info::last_price() const {
+  // @@protoc_insertion_point(field_get:MD_Info.last_price)
+  return last_price_;
+}
+inline void MD_Info::set_last_price(double value) {
+  
+  last_price_ = value;
+  // @@protoc_insertion_point(field_set:MD_Info.last_price)
+}
+
+// fixed32 volume = 2;
+inline void MD_Info::clear_volume() {
+  volume_ = 0u;
+}
+inline ::google::protobuf::uint32 MD_Info::volume() const {
+  // @@protoc_insertion_point(field_get:MD_Info.volume)
+  return volume_;
+}
+inline void MD_Info::set_volume(::google::protobuf::uint32 value) {
+  
+  volume_ = value;
+  // @@protoc_insertion_point(field_set:MD_Info.volume)
+}
+
+// bool msg_received = 3;
+inline void MD_Info::clear_msg_received() {
+  msg_received_ = false;
+}
+inline bool MD_Info::msg_received() const {
+  // @@protoc_insertion_point(field_get:MD_Info.msg_received)
+  return msg_received_;
+}
+inline void MD_Info::set_msg_received(bool value) {
+  
+  msg_received_ = value;
+  // @@protoc_insertion_point(field_set:MD_Info.msg_received)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

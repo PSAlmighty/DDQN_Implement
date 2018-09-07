@@ -27,10 +27,11 @@ class CAgent
 {
 public:
 
-	CAgent(string,string);
+	CAgent(string,string,string);
 	~CAgent();
 
-	void Start_ZMQ_Server();
+	void Start_MD_ZMQ_Server();
+	void Start_AG_ZMQ_Server();
 
 	void SliceThreadPool(CThostFtdcDepthMarketDataField *DepthData);
 
@@ -60,6 +61,10 @@ private:
 	void CleanPosition(CThostFtdcDepthMarketDataField *DepthData);
 	void PendingOrder(CThostFtdcDepthMarketDataField *DepthData, double, int, char, char);
 
+	void Broadcast_MD(CThostFtdcDepthMarketDataField *DepthData);
+	void Send_Agent_Status();
+	void Get_Agent_Action();
+
 	double Factorial(double fc);
 
 	TThostFtdcTimeType Timer;
@@ -70,20 +75,28 @@ private:
 	double DailyStopLimit;
 	bool bStopTrading;
 	bool bMktClosing;
+	bool bMD_PyReady;
+	bool bAG_PyReady;
 
 	depth_struct DepthAB;
 
 	string InstrumentID;
-	string instrument_pipe_name;
+	string instrument_md_pipe_name;
+	string instrument_ag_pipe_name;
+
 	string TradingDATE;
 	string TradingTIME;
 	string Previous_Action_Timestamp;
 
 	int InitVolume;
 
-	void *ZMQ_Context;
-	void *ZMQ_Responder;
+	void *MD_ZMQ_Context;
+	void *MD_ZMQ_Responder;
+	void *AG_ZMQ_Context;
+	void *AG_ZMQ_Responder;
+
 	Agent_Info ptAgInfo;
+	MD_Info ptMD_Info;
 
 	pthread_mutex_t csInstrumentInternalLock;
 
