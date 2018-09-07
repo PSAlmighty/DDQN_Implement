@@ -63,11 +63,7 @@ bool IsFlowControl(int iResult)
 void CTraderSpi::OnFrontConnected()
 {
 	cerr << " --->>> " << "OnFrontConnected" << endl;
-	///用户登录请求
 	ReqUserLogin();
-	//cerr<<Citic_Thost_Params.BROKER_ID<<endl;
-	//cerr<<Citic_Thost_Params.INVESTOR_ID<<endl;
-	//cerr<<Citic_Thost_Params.PASSWORD<<endl;
 }
 
 void CTraderSpi::ReqUserLogin()
@@ -86,7 +82,7 @@ void CTraderSpi::ReqUserLogin()
 void CTraderSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	cerr << " --->>> " << "OnRspUserLogin" << endl;
+	cerr << " --->>> " << "OnRspiveTradingUserLogin" << endl;
 	if (bIsLast && !IsErrorRspInfo(pRspInfo))
 	{
 		// 保存会话参数
@@ -172,9 +168,9 @@ void CTraderSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CTho
 		{
 			//InstrumentInfo << " --->>> Trading IntrumentID：" << pInstrument->InstrumentID << endl;
 			//InstrumentInfo << " --->>> Trading Intrument Name：" << pInstrument->InstrumentName << endl;
-			//InstrumentInfo << " --->>> Intrument Tick Size：" << pInstrument->PriceTick << endl;
-			//InstrumentInfo << " --->>> Instrument Leverage：" << pInstrument->VolumeMultiple << endl;
-			//InstrumentInfo << " --->>> ExchangeID：" << pInstrument->ExchangeID << endl;
+			InstrumentInfo << " --->>> Intrument Tick Size：" << pInstrument->PriceTick << endl;
+			InstrumentInfo << " --->>> Instrument Leverage：" << pInstrument->VolumeMultiple << endl;
+			InstrumentInfo << " --->>> ExchangeID：" << pInstrument->ExchangeID << endl;
 			//InstrumentInfo << "-----------------------------------------" << endl;
 			pthread_mutex_lock(&csMMObjectLock);
 
@@ -465,44 +461,18 @@ void *CTraderSpi::OrderRtnCallBack(void *pvContext)
 
 	pthread_mutex_lock(&csMMObjectLock);
 	//////////////////////////////////////////////////////////
-	if (pParam->OrderStatus == THOST_FTDC_OST_NoTradeQueueing)
-	{
+	if (pParam->OrderStatus == THOST_FTDC_OST_NoTradeQueueing){
 		//pthread_mutex_lock(&mp_csOrderDoneFlag[pParam->InstrumentID]);
-		mpMM[pParam->InstrumentID]->SetCancelField(pParam, pParam->VolumeTotal);
-
-		RESULT = "Order Inserted";
 		//cerr << RESULT << endl;
 
 	}
-	else if (pParam->OrderStatus == THOST_FTDC_OST_PartTradedQueueing)
-	{
-		mpMM[pParam->InstrumentID]->SetUnfilledLots(pParam->OrderSysID, pParam->VolumeTotal, pParam->LimitPrice);
-
-		RESULT = "Order Partly Filled";
+	else if (pParam->OrderStatus == THOST_FTDC_OST_PartTradedQueueing){
 		//cerr << RESULT << endl;
-
 	}
-	else if (pParam->OrderStatus == THOST_FTDC_OST_Canceled)
-	{
-		mpMM[pParam->InstrumentID]->ResetOrderDoneFlag(pParam);
-		mpMM[pParam->InstrumentID]->DeleteLimitOrderCancel(pParam->LimitPrice, pParam->OrderSysID, pParam->Direction, pParam->CombOffsetFlag[0], pParam->VolumeTotal);
-
-		//Operating vcOrderRef
-		pthread_mutex_lock(&csInsert);
-		vector<int>::iterator OrderRefIt = find(vcOrderRef.begin(), vcOrderRef.end(), atoi(pParam->OrderRef));
-		if (OrderRefIt != vcOrderRef.end())
-			vcOrderRef.erase(OrderRefIt);
-		pthread_mutex_unlock(&csInsert);
-
-		RESULT = "Order Canceled";
+	else if (pParam->OrderStatus == THOST_FTDC_OST_Canceled){
 		//cerr << RESULT << endl;
-
 	}
-	else if (pParam->OrderStatus == THOST_FTDC_OST_AllTraded)
-	{
-		mpMM[pParam->InstrumentID]->ResetOrderDoneFlag(pParam);
-		mpMM[pParam->InstrumentID]->DeleteLimitOrderFilled(pParam->LimitPrice, pParam->OrderSysID, pParam->Direction, pParam->VolumeTotal);
-
+	else if (pParam->OrderStatus == THOST_FTDC_OST_AllTraded){
 		//Operating vcOrderRef
 		pthread_mutex_lock(&csInsert);
 		vector<int>::iterator OrderRefIt = find(vcOrderRef.begin(), vcOrderRef.end(), atoi(pParam->OrderRef));
@@ -514,20 +484,6 @@ void *CTraderSpi::OrderRtnCallBack(void *pvContext)
 		//cerr << RESULT << endl;
 
 	}
-	//else if (pParam->OrderStatus == THOST_FTDC_OST_NoTradeNotQueueing)
-	//{
-	//	mpMM[pParam->InstrumentID]->ResetOrderDoneFlag(pParam);
-	//	mpMM[pParam->InstrumentID]->DeleteLimitOrderCancel(pParam->LimitPrice, pParam->OrderSysID, pParam->Direction, pParam->CombOffsetFlag[0], pParam->VolumeCondition);
-
-	//	//Operating vcOrderRef
-	//	pthread_mutex_lock(&csInsert);
-	//	vector<int>::iterator OrderRefIt = find(vcOrderRef.begin(), vcOrderRef.end(), atoi(pParam->OrderRef));
-	//	if (OrderRefIt != vcOrderRef.end())
-	//		vcOrderRef.erase(OrderRefIt);
-	//	pthread_mutex_unlock(&csInsert);
-	//
-	//	RESULT = "Order Error";
-	//}
 	//////////////////////////////////////////////////////////
 	pthread_mutex_unlock(&csMMObjectLock);
 

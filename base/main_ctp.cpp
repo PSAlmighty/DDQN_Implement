@@ -30,9 +30,7 @@ CThread_Pool *_ThreadPool;
 
 
 char  LIVE_M_FRONT_ADDR[] = "tcp://211.144.195.157 :41213";
-//char  LIVE_M_FRONT_ADDR[] = "tcp://101.95.8.178 :51213";
-char  LIVE_T_FRONT_ADDR[] = "tcp://211.144.195.157 :41205";	// 前置地址Live
-//char  LIVE_T_FRONT_ADDR[] = "tcp://101.95.8.178 :51205";	// 前置地址Live
+char  LIVE_T_FRONT_ADDR[] = "tcp://apcitapps01 :41205";		// 前置地址Live
 
 ThostFtdcParams Citic_Thost_Params;
 
@@ -207,11 +205,11 @@ int main(int argc, char *argv[]){
 	pthread_t hInsertOrderThread;
 	pthread_t hCancelOrderThread;
 
-	//if(pthread_create(&hThreadTrader,NULL, Trading, NULL))
-	//	printf("Failed create Trader Thread\n");
-	//pthread_mutex_lock(&csMainThreadLock);
-	//pthread_cond_wait(&hTradingThreadDone,&csMainThreadLock);
-	//pthread_mutex_unlock(&csMainThreadLock);
+	if(pthread_create(&hThreadTrader,NULL, Trading, NULL))
+		printf("Failed create Trader Thread\n");
+	pthread_mutex_lock(&csMainThreadLock);
+	pthread_cond_wait(&hTradingThreadDone,&csMainThreadLock);
+	pthread_mutex_unlock(&csMainThreadLock);
 
 	//Initialize mpAgent
 	for (int i = 0; i < iInstrumentID; i++){
@@ -250,7 +248,7 @@ int main(int argc, char *argv[]){
 		pthread_cond_wait(&hRtnDepMktOutPut,&csMainThreadLock);
 		pthread_mutex_unlock(&csMainThreadLock);
 
-		system("clear");
+		//system("clear");
 		pthread_mutex_lock(&csMMObjectLock);
 
 		pthread_mutex_unlock(&csMMObjectLock);
@@ -344,7 +342,7 @@ void *InsertOrderThread(void *lpParameter)
 			///数量
 			req.VolumeTotalOriginal = p_qToPush->front().VolumeTotalOriginal;
 			///有效期类型: 当日有效
-			req.TimeCondition = THOST_FTDC_TC_GFD;
+			req.TimeCondition = p_qToPush->front().TimeCondition;
 			///GTD日期
 			//	TThostFtdcDateType	GTDDate;
 			///成交量类型: 任何数量
@@ -377,23 +375,16 @@ void *InsertOrderThread(void *lpParameter)
 
 			//cerr << req.InstrumentID << " " << req.LimitPrice << endl;
 			
-			if (iResult != 0)
+			if (PendingLog.is_open())
 			{
-				mpMM[ID]->ResetOrderDoneFlag(ID, req.Direction);
+				PendingLog << p_qToPush->front().InstrumentID << ",";
+				PendingLog << p_qToPush->front().CombOffsetFlag << ",";
+				PendingLog << p_qToPush->front().Direction << ",";
+				PendingLog << p_qToPush->front().LimitPrice << ",";
+				PendingLog << p_qToPush->front().VolumeTotalOriginal << ",";
+				PendingLog << p_qToPush->front().OrderRef << endl;
 			}
-			else
-			{
-				if (PendingLog.is_open())
-				{
-					PendingLog << p_qToPush->front().InstrumentID << ",";
-					PendingLog << p_qToPush->front().CombOffsetFlag << ",";
-					PendingLog << p_qToPush->front().Direction << ",";
-					PendingLog << p_qToPush->front().LimitPrice << ",";
-					PendingLog << p_qToPush->front().VolumeTotalOriginal << ",";
-					PendingLog << p_qToPush->front().OrderRef << endl;
-				}
-				PendingLog.close();
-			}
+			PendingLog.close();
 
 			p_qToPush->pop();
 		}

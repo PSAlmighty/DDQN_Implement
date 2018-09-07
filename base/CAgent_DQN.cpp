@@ -44,28 +44,6 @@ CAgent::CAgent(string _ID,string _pipe_name){
 	InstrumentID = _ID;
 	instrument_pipe_name = _pipe_name;
 
-	bLongOrderFilled = true;
-	bShortOrderFilled = true;
-
-	bLastTradedLong = false;
-	bLastTradedShort = false;
-
-	bInitialVolume = true;
-	bTickChanged = true;
-
-	bMktClosing = false;
-	bStopTrading = false;
-
-	bLongClosingFlagEnable = true;
-	bShortClosingFlagEnable = true;
-
-	bCriticalBid = false;
-	bCriticalAsk = false;
-
-	mpUnfilledOrder.clear();
-	mpUnfilledOrderLots.clear();
-	mpUnfilledOrderSizeForCheck.clear();
-
 	Hours = 0;
 	Minutes = 0;
 	Seconds = 0;
@@ -73,12 +51,8 @@ CAgent::CAgent(string _ID,string _pipe_name){
 	InitVolume = 0;
 	TotalTrades = 0;
 
-	DepthAB.ask_price = 0;
-	DepthAB.bid_price = 0;
-
-	LongLimitPrice = 0;
-	ShortLimitPrice = 0;
-	LastOpenPrice = 0;
+	bMktClosing = false;
+	bStopTrading = false;
 
 	Posi.mp_PriceMap.clear();
 	Posi.NetPosition = 0;
@@ -93,14 +67,10 @@ CAgent::CAgent(string _ID,string _pipe_name){
 	pthread_mutex_init(&csInstrumentUnfillFlagLock,NULL);
 	pthread_mutex_init(&csInstrumentUnfillOrderLock,NULL);
 
-	Start_ZMQ_Server();
+//	Start_ZMQ_Server();
 }
 
 CAgent::~CAgent(){
-	if (LongLimitPrice != 0)
-		PullOrderBack(LongLimitPrice);
-	if (ShortLimitPrice != 0)
-		PullOrderBack(ShortLimitPrice);
 	pthread_mutex_destroy(&csInstrumentInternalLock);
 	pthread_mutex_destroy(&csInstrumentUnfillFlagLock);
 	pthread_mutex_destroy(&csInstrumentUnfillOrderLock);
@@ -150,90 +120,20 @@ void *CAgent::SliceCallBack(void *arg){
 			|| (pThis->Hours == 13 && pThis->Minutes == 32 && pThis->Seconds > 30)
 			|| (pThis->Hours == 23 && pThis->Minutes == 32 && pThis->Seconds > 30)){
 			pThis->bMktClosing = false;
-			pThis->bShortOrderFilled = true;
-			pThis->bLongOrderFilled = true;
 		}
 	}
 	
 	if (!pThis->bMktClosing
 		&& !pThis->bStopTrading){
-		//pThis->CheckLimitOrderQuene(false);
 		//pThis->DQN_Action(pThis->SprDepthData);
 		cerr<<"Heartbeat Working\n";
-	}
-	else{
-		pThis->CleanPosition(pThis->SprDepthData);
+		cerr<<pThis->SprDepthData->LastPrice<<endl;
 	}
 
 	pThis->CalculatePnL(pThis->SprDepthData);
 
 	pthread_mutex_unlock(&pThis->csInstrumentInternalLock);
 	return NULL;
-}
-
-void CAgent::DeleteLimitOrderFilled(double price, string OrderSysID, char Dir, int _OrderSize)
-{
-	pthread_mutex_lock(&csInstrumentUnfillOrderLock);
-
-	if (!mpUnfilledOrder.empty()){
-		if (mpUnfilledOrder.find(price) != mpUnfilledOrder.end()){
-			if (mpUnfilledOrder[price].find(OrderSysID) != mpUnfilledOrder[price].end()
-				&& !mpUnfilledOrder[price].empty()){
-
-				mpUnfilledOrder[price].erase(mpUnfilledOrder[price].find(OrderSysID));
-			}
-		}
-	}
-
-	if (!mpUnfilledOrderLots.empty()){
-		if (mpUnfilledOrderLots.find(OrderSysID) != mpUnfilledOrderLots.end())
-			mpUnfilledOrderLots.erase(mpUnfilledOrderLots.find(OrderSysID));
-	}
-
-	if (!mpUnfilledOrderSizeForCheck.empty()){
-		mpUnfilledOrderSizeForCheck[price] -= _OrderSize;
-	}
-
-
-	if (Dir == THOST_FTDC_D_Buy)
-		LongLimitPrice = 0;
-	else if (Dir == THOST_FTDC_D_Sell)
-		ShortLimitPrice = 0;
-
-	pthread_mutex_unlock(&csInstrumentUnfillOrderLock);
-}
-
-void CAgent::DeleteLimitOrderCancel(double price, string OrderSysID, char Dir, char OffsetFlag, int _OrderSize){
-	pthread_mutex_lock(&csInstrumentUnfillOrderLock);
-
-	if (!mpUnfilledOrder.empty()){
-		if (mpUnfilledOrder.find(price) != mpUnfilledOrder.end()){
-			if (mpUnfilledOrder[price].find(OrderSysID) != mpUnfilledOrder[price].end()
-				&& !mpUnfilledOrder[price].empty()){
-				mpUnfilledOrder[price].erase(mpUnfilledOrder[price].find(OrderSysID));
-			}
-		}
-	}
-
-	if (!mpUnfilledOrderLots.empty()){
-		if (mpUnfilledOrderLots.find(OrderSysID) != mpUnfilledOrderLots.end())
-			mpUnfilledOrderLots.erase(mpUnfilledOrderLots.find(OrderSysID));
-	}
-
-	if (!mpUnfilledOrderSizeForCheck.empty()){
-		mpUnfilledOrderSizeForCheck[price] -= _OrderSize;
-	}
-
-	pthread_mutex_unlock(&csInstrumentUnfillOrderLock);
-}
-
-void CAgent::SetUnfilledLots(string sysID, int TotalVolume,double price){
-	pthread_mutex_lock(&csInstrumentUnfillOrderLock);
-
-	mpUnfilledOrderLots[sysID] = TotalVolume;
-	mpUnfilledOrderSizeForCheck[price] = TotalVolume;
-
-	pthread_mutex_unlock(&csInstrumentUnfillOrderLock);
 }
 
 void CAgent::DQN_Action(CThostFtdcDepthMarketDataField * DepthData)
@@ -280,41 +180,6 @@ void CAgent::DQN_Action(CThostFtdcDepthMarketDataField * DepthData)
 	pthread_mutex_unlock(&csInstrumentUnfillFlagLock);
 }
 
-void CAgent::CleanPosition(CThostFtdcDepthMarketDataField * DepthData)
-{
-	pthread_mutex_lock(&csInstrumentUnfillFlagLock);
-
-	char CloseOffSetFlag;
-	if (InstrumentExchangeID == "SHFE")
-		CloseOffSetFlag = THOST_FTDC_OF_CloseToday;
-	else
-		CloseOffSetFlag = THOST_FTDC_OF_Close;
-
-	//if (bLongOrderFilled)
-	//{
-	//	if (ShortInventory > 0)
-	//	{
-	//		CheckLimitOrderQuene(true);
-	//		PendingOrder(DepthData, DepthData->AskPrice1, ShortInventory, CloseOffSetFlag, THOST_FTDC_D_Buy);;
-	//		bShortOrderFilled = false;
-	//	}
-	//}
-
-	//if (bShortOrderFilled)
-	//{
-	//	if (LongInventory > 0)
-	//	{
-	//		CheckLimitOrderQuene(true);
-	//		PendingOrder(DepthData, DepthData->BidPrice1, LongInventory, CloseOffSetFlag, THOST_FTDC_D_Sell);
-	//		bShortOrderFilled = false;
-	//	}
-	//}
-
-
-
-	pthread_mutex_unlock(&csInstrumentUnfillFlagLock);
-}
-
 void CAgent::PendingOrder(CThostFtdcDepthMarketDataField *DepthData, double price, int lots, char offlag, char direction)
 {
 	CThostFtdcInputOrderField req;
@@ -351,7 +216,8 @@ void CAgent::PendingOrder(CThostFtdcDepthMarketDataField *DepthData, double pric
 	req.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
 	req.LimitPrice = price;
 	req.VolumeTotalOriginal = abs(lots);
-	req.TimeCondition = THOST_FTDC_TC_GFD;
+	//req.TimeCondition = THOST_FTDC_TC_GFD;
+	req.TimeCondition = THOST_FTDC_TC_IOC;
 	//	TThostFtdcDateType	GTDDate;
 	req.VolumeCondition = THOST_FTDC_VC_AV;
 	req.MinVolume = 1;
@@ -365,11 +231,6 @@ void CAgent::PendingOrder(CThostFtdcDepthMarketDataField *DepthData, double pric
 
 	req.CombOffsetFlag[0] = offlag;
 
-	if (direction == THOST_FTDC_D_Buy)
-		LongLimitPrice = price;
-	else if (direction == THOST_FTDC_D_Sell)
-		ShortLimitPrice = price;
-
 	pthread_mutex_lock(&csInsert);
 
 	qInsertOrderQueue.push(req);
@@ -378,26 +239,6 @@ void CAgent::PendingOrder(CThostFtdcDepthMarketDataField *DepthData, double pric
 	pthread_mutex_unlock(&csInsert);
 
 	//SetEvent(hInsertEvent);
-}
-
-void CAgent::PullOrderBack(double price){
-	pthread_mutex_lock(&csInstrumentUnfillOrderLock);
-	pthread_mutex_lock(&csCancel);
-
-	if (mpUnfilledOrder.find(price) != mpUnfilledOrder.end()
-		&& !mpUnfilledOrder[price].empty()){
-		for (map<string, CThostFtdcInputOrderActionField>::iterator mp_it = mpUnfilledOrder[price].begin();
-			mp_it != mpUnfilledOrder[price].end();){
-
-			qCancelOrderQueue.push(mp_it->second);
-			mpUnfilledOrder[price].erase(mp_it++);
-		}
-	}
-	//SetEvent(hCancelEvent);
-	pthread_cond_signal(&hCancelEvent);
-
-	pthread_mutex_unlock(&csCancel);
-	pthread_mutex_unlock(&csInstrumentUnfillOrderLock);
 }
 
 void CAgent::SetPositionStatus(CThostFtdcTradeField * pTrade){
@@ -435,19 +276,13 @@ void CAgent::SetPositionStatus(CThostFtdcTradeField * pTrade){
 	if (pTrade->OffsetFlag == '0')
 	{
 		OffSetFlag = "OPEN";
-		LastOpenPrice = pTrade->Price;
-
 		//DiretionType is a char '0'=buy '1'=sell
 		//OffsetFlag is a char '0'=open '1'=close
 		if (pTrade->Direction == '0'){
 			Direction = "LONG";
-			bLastTradedLong = true;
-			bLastTradedShort = false;
 		}
 		else{
 			Direction = "SHORT";
-			bLastTradedLong = false;
-			bLastTradedShort = true;
 		}
 
 		if (Posi.mp_PositionDistribution.find(pTrade->Price) == Posi.mp_PositionDistribution.end())
@@ -474,19 +309,13 @@ void CAgent::SetPositionStatus(CThostFtdcTradeField * pTrade){
 	}
 	else{
 		OffSetFlag = "CLOSE";
-		LastOpenPrice = 0;
-
 		//DiretionType is a char '0'=buy '1'=sell
 		//OffsetFlag is a char '0'=open '1'=close
 		if (pTrade->Direction == '0'){
 			Direction = "LONG";
-			bLastTradedLong = true;
-			bLastTradedShort = false;
 		}
 		else{
 			Direction = "SHORT";
-			bLastTradedLong = false;
-			bLastTradedShort = true;
 		}
 
 		Posi.mp_PositionDistribution.clear();
@@ -502,71 +331,6 @@ void CAgent::SetPositionStatus(CThostFtdcTradeField * pTrade){
 	}
 }
 
-void CAgent::SetCancelField(CThostFtdcOrderField * pOrder,int OriginVolume){
-	CThostFtdcInputOrderActionField req;
-	//char tmpDirection = pOrder->Direction;
-	double OrderPrice;
-	string sysID;
-
-	pthread_mutex_lock(&csInstrumentUnfillOrderLock);
-
-	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, pOrder->BrokerID);
-	strcpy(req.InvestorID, pOrder->InvestorID);
-	strcpy(req.OrderRef, pOrder->OrderRef);
-	strcpy(req.InstrumentID, pOrder->InstrumentID);
-
-	strcpy(req.ExchangeID, pOrder->ExchangeID);
-	strcpy(req.OrderSysID, pOrder->OrderSysID);
-	req.ActionFlag = THOST_FTDC_AF_Delete;
-	req.LimitPrice = pOrder->LimitPrice;
-
-	OrderPrice = pOrder->LimitPrice;
-	sysID = pOrder->OrderSysID;
-
-	mpUnfilledOrder[OrderPrice][sysID]= req;
-	mpUnfilledOrderLots[sysID] = OriginVolume;
-	if (!mpUnfilledOrderSizeForCheck.empty()){
-		if (mpUnfilledOrderSizeForCheck.find(OrderPrice) != mpUnfilledOrderSizeForCheck.end())
-			mpUnfilledOrderSizeForCheck[OrderPrice] += OriginVolume;
-		else
-			mpUnfilledOrderSizeForCheck[OrderPrice] = OriginVolume;
-	}
-
-	pthread_mutex_unlock(&csInstrumentUnfillOrderLock);
-}
-
-void CAgent::ResetOrderDoneFlag(CThostFtdcOrderField * pOrder){
-	pthread_mutex_lock(&csInstrumentUnfillFlagLock);
-
-	if (InstrumentID == pOrder->InstrumentID){
-		if (pOrder->Direction == '1'){
-			bShortOrderFilled = true;
-		}
-		
-		if (pOrder->Direction == '0'){
-			bLongOrderFilled = true;
-		}
-	}
-
-	pthread_mutex_unlock(&csInstrumentUnfillFlagLock);
-}
-
-void CAgent::ResetOrderDoneFlag(string& _ID, char _direction){
-	pthread_mutex_lock(&csInstrumentUnfillFlagLock);
-
-	if (InstrumentID == _ID){
-		if (_direction == '1'){
-			bShortOrderFilled = true;
-		}
-
-		if (_direction == '0'){
-			bLongOrderFilled = true;
-		}
-	}
-
-	pthread_mutex_unlock(&csInstrumentUnfillFlagLock);
-}
 
 void CAgent::CalculatePnL(CThostFtdcDepthMarketDataField *DepthData){
 	Posi.InstrumentID = DepthData->InstrumentID;
@@ -581,17 +345,6 @@ void CAgent::CalculatePnL(CThostFtdcDepthMarketDataField *DepthData){
 	Posi.CostLine = Posi.TotalValue / total_lots;
 }
 
-double CAgent::Factorial(double fc)
-{
-	if (fc < 0)
-		return 1;
-	else if (fc == 0 || fc == 1)
-		return 1;
-	else if (fc > 1)
-		return fc*Factorial(fc - 1);
-	else
-		return -1;
-}
 
 string CAgent::GetTimer(){
 	return SprDepthData->UpdateTime;
