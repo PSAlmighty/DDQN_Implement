@@ -3,5 +3,6 @@
 git pull
 git status
 git add *
+git rm -r --cached ./Py_Opponent/model
 git commit -m "$1" 
 git push origin master
