@@ -1,5 +1,0 @@
-#!/bin/bash
-make 
-make clean
-./CTP_Agent 66666 103201168 094519
-
