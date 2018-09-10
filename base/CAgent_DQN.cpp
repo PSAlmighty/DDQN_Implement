@@ -133,8 +133,7 @@ void *CAgent::SliceCallBack(void *arg){
 		cerr<<pThis->SprDepthData->UpdateTime<<endl;
 		cerr<<pThis->SprDepthData->Volume<<endl;
 		cerr<<pThis->SprDepthData->LastPrice<<endl;
-		if(pThis->bMD_PyReady)
-			pThis->Broadcast_MD(pThis->SprDepthData);
+		pThis->Broadcast_MD(pThis->SprDepthData);
 	}
 
 	pThis->CalculatePnL(pThis->SprDepthData);
