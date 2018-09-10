@@ -91,7 +91,7 @@ private:
 	int InitVolume;
 
 	void *MD_ZMQ_Context;
-	void *MD_ZMQ_Responder;
+	void *MD_ZMQ_Publisher;
 	void *AG_ZMQ_Context;
 	void *AG_ZMQ_Responder;
 

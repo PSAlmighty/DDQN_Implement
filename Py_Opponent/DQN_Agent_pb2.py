@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='DQN_Agent.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\x0f\x44QN_Agent.proto\"\xa4\x01\n\nAgent_Info\x12\x14\n\x0c\x41gent_Action\x18\x01 \x01(\x07\x12\x18\n\x10\x43urrent_Position\x18\x02 \x01(\x07\x12 \n\x18\x41gent_Trading_Instrument\x18\x03 \x01(\t\x12\x18\n\x10\x41\x63tion_Timestamp\x18\x04 \x01(\t\x12\x14\n\x0cLatestResult\x18\x05 \x01(\x08\x12\x14\n\x0cmsg_received\x18\x06 \x01(\x08\"Y\n\x07MD_Info\x12\x12\n\nlast_price\x18\x01 \x01(\x01\x12\x0e\n\x06volume\x18\x02 \x01(\x07\x12\x14\n\x0cmsg_received\x18\x03 \x01(\x08\x12\x14\n\x0cMD_Timestamp\x18\x04 \x01(\tb\x06proto3')
+  serialized_pb=_b('\n\x0f\x44QN_Agent.proto\"\xa5\x01\n\nAgent_Info\x12\x14\n\x0c\x41gent_Action\x18\x01 \x01(\x07\x12\x18\n\x10\x43urrent_Position\x18\x02 \x01(\x07\x12 \n\x18\x41gent_Trading_Instrument\x18\x03 \x01(\t\x12\x18\n\x10\x41\x63tion_Timestamp\x18\x04 \x01(\t\x12\x14\n\x0cLatestResult\x18\x05 \x01(\x08\x12\x15\n\rmsg_pipe_init\x18\x06 \x01(\x08\"q\n\x07MD_Info\x12\x12\n\nlast_price\x18\x01 \x01(\x01\x12\x0e\n\x06volume\x18\x02 \x01(\x07\x12\x15\n\rmsg_pipe_init\x18\x03 \x01(\x08\x12\x14\n\x0cMD_Timestamp\x18\x04 \x01(\t\x12\x15\n\rMD_Instrument\x18\x05 \x01(\tb\x06proto3')
 )
 
 
@@ -68,7 +68,7 @@ _AGENT_INFO = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='msg_received', full_name='Agent_Info.msg_received', index=5,
+      name='msg_pipe_init', full_name='Agent_Info.msg_pipe_init', index=5,
       number=6, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -87,7 +87,7 @@ _AGENT_INFO = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=20,
-  serialized_end=184,
+  serialized_end=185,
 )
 
 
@@ -113,7 +113,7 @@ _MD_INFO = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='msg_received', full_name='MD_Info.msg_received', index=2,
+      name='msg_pipe_init', full_name='MD_Info.msg_pipe_init', index=2,
       number=3, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -122,6 +122,13 @@ _MD_INFO = _descriptor.Descriptor(
     _descriptor.FieldDescriptor(
       name='MD_Timestamp', full_name='MD_Info.MD_Timestamp', index=3,
       number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='MD_Instrument', full_name='MD_Info.MD_Instrument', index=4,
+      number=5, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -138,8 +145,8 @@ _MD_INFO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=186,
-  serialized_end=275,
+  serialized_start=187,
+  serialized_end=300,
 )
 
 DESCRIPTOR.message_types_by_name['Agent_Info'] = _AGENT_INFO

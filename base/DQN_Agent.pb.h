@@ -188,11 +188,11 @@ class Agent_Info : public ::google::protobuf::Message /* @@protoc_insertion_poin
   bool latestresult() const;
   void set_latestresult(bool value);
 
-  // bool msg_received = 6;
-  void clear_msg_received();
-  static const int kMsgReceivedFieldNumber = 6;
-  bool msg_received() const;
-  void set_msg_received(bool value);
+  // bool msg_pipe_init = 6;
+  void clear_msg_pipe_init();
+  static const int kMsgPipeInitFieldNumber = 6;
+  bool msg_pipe_init() const;
+  void set_msg_pipe_init(bool value);
 
   // @@protoc_insertion_point(class_scope:Agent_Info)
  private:
@@ -203,7 +203,7 @@ class Agent_Info : public ::google::protobuf::Message /* @@protoc_insertion_poin
   ::google::protobuf::uint32 agent_action_;
   ::google::protobuf::uint32 current_position_;
   bool latestresult_;
-  bool msg_received_;
+  bool msg_pipe_init_;
   mutable int _cached_size_;
   friend struct ::protobuf_DQN_5fAgent_2eproto::TableStruct;
   friend void ::protobuf_DQN_5fAgent_2eproto::InitDefaultsAgent_InfoImpl();
@@ -306,6 +306,20 @@ class MD_Info : public ::google::protobuf::Message /* @@protoc_insertion_point(c
   ::std::string* release_md_timestamp();
   void set_allocated_md_timestamp(::std::string* md_timestamp);
 
+  // string MD_Instrument = 5;
+  void clear_md_instrument();
+  static const int kMDInstrumentFieldNumber = 5;
+  const ::std::string& md_instrument() const;
+  void set_md_instrument(const ::std::string& value);
+  #if LANG_CXX11
+  void set_md_instrument(::std::string&& value);
+  #endif
+  void set_md_instrument(const char* value);
+  void set_md_instrument(const char* value, size_t size);
+  ::std::string* mutable_md_instrument();
+  ::std::string* release_md_instrument();
+  void set_allocated_md_instrument(::std::string* md_instrument);
+
   // double last_price = 1;
   void clear_last_price();
   static const int kLastPriceFieldNumber = 1;
@@ -318,20 +332,21 @@ class MD_Info : public ::google::protobuf::Message /* @@protoc_insertion_point(c
   ::google::protobuf::uint32 volume() const;
   void set_volume(::google::protobuf::uint32 value);
 
-  // bool msg_received = 3;
-  void clear_msg_received();
-  static const int kMsgReceivedFieldNumber = 3;
-  bool msg_received() const;
-  void set_msg_received(bool value);
+  // bool msg_pipe_init = 3;
+  void clear_msg_pipe_init();
+  static const int kMsgPipeInitFieldNumber = 3;
+  bool msg_pipe_init() const;
+  void set_msg_pipe_init(bool value);
 
   // @@protoc_insertion_point(class_scope:MD_Info)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr md_timestamp_;
+  ::google::protobuf::internal::ArenaStringPtr md_instrument_;
   double last_price_;
   ::google::protobuf::uint32 volume_;
-  bool msg_received_;
+  bool msg_pipe_init_;
   mutable int _cached_size_;
   friend struct ::protobuf_DQN_5fAgent_2eproto::TableStruct;
   friend void ::protobuf_DQN_5fAgent_2eproto::InitDefaultsMD_InfoImpl();
@@ -495,18 +510,18 @@ inline void Agent_Info::set_latestresult(bool value) {
   // @@protoc_insertion_point(field_set:Agent_Info.LatestResult)
 }
 
-// bool msg_received = 6;
-inline void Agent_Info::clear_msg_received() {
-  msg_received_ = false;
+// bool msg_pipe_init = 6;
+inline void Agent_Info::clear_msg_pipe_init() {
+  msg_pipe_init_ = false;
 }
-inline bool Agent_Info::msg_received() const {
-  // @@protoc_insertion_point(field_get:Agent_Info.msg_received)
-  return msg_received_;
+inline bool Agent_Info::msg_pipe_init() const {
+  // @@protoc_insertion_point(field_get:Agent_Info.msg_pipe_init)
+  return msg_pipe_init_;
 }
-inline void Agent_Info::set_msg_received(bool value) {
+inline void Agent_Info::set_msg_pipe_init(bool value) {
   
-  msg_received_ = value;
-  // @@protoc_insertion_point(field_set:Agent_Info.msg_received)
+  msg_pipe_init_ = value;
+  // @@protoc_insertion_point(field_set:Agent_Info.msg_pipe_init)
 }
 
 // -------------------------------------------------------------------
@@ -541,18 +556,18 @@ inline void MD_Info::set_volume(::google::protobuf::uint32 value) {
   // @@protoc_insertion_point(field_set:MD_Info.volume)
 }
 
-// bool msg_received = 3;
-inline void MD_Info::clear_msg_received() {
-  msg_received_ = false;
+// bool msg_pipe_init = 3;
+inline void MD_Info::clear_msg_pipe_init() {
+  msg_pipe_init_ = false;
 }
-inline bool MD_Info::msg_received() const {
-  // @@protoc_insertion_point(field_get:MD_Info.msg_received)
-  return msg_received_;
+inline bool MD_Info::msg_pipe_init() const {
+  // @@protoc_insertion_point(field_get:MD_Info.msg_pipe_init)
+  return msg_pipe_init_;
 }
-inline void MD_Info::set_msg_received(bool value) {
+inline void MD_Info::set_msg_pipe_init(bool value) {
   
-  msg_received_ = value;
-  // @@protoc_insertion_point(field_set:MD_Info.msg_received)
+  msg_pipe_init_ = value;
+  // @@protoc_insertion_point(field_set:MD_Info.msg_pipe_init)
 }
 
 // string MD_Timestamp = 4;
@@ -606,6 +621,59 @@ inline void MD_Info::set_allocated_md_timestamp(::std::string* md_timestamp) {
   }
   md_timestamp_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), md_timestamp);
   // @@protoc_insertion_point(field_set_allocated:MD_Info.MD_Timestamp)
+}
+
+// string MD_Instrument = 5;
+inline void MD_Info::clear_md_instrument() {
+  md_instrument_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& MD_Info::md_instrument() const {
+  // @@protoc_insertion_point(field_get:MD_Info.MD_Instrument)
+  return md_instrument_.GetNoArena();
+}
+inline void MD_Info::set_md_instrument(const ::std::string& value) {
+  
+  md_instrument_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:MD_Info.MD_Instrument)
+}
+#if LANG_CXX11
+inline void MD_Info::set_md_instrument(::std::string&& value) {
+  
+  md_instrument_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:MD_Info.MD_Instrument)
+}
+#endif
+inline void MD_Info::set_md_instrument(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  md_instrument_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:MD_Info.MD_Instrument)
+}
+inline void MD_Info::set_md_instrument(const char* value, size_t size) {
+  
+  md_instrument_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:MD_Info.MD_Instrument)
+}
+inline ::std::string* MD_Info::mutable_md_instrument() {
+  
+  // @@protoc_insertion_point(field_mutable:MD_Info.MD_Instrument)
+  return md_instrument_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* MD_Info::release_md_instrument() {
+  // @@protoc_insertion_point(field_release:MD_Info.MD_Instrument)
+  
+  return md_instrument_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void MD_Info::set_allocated_md_instrument(::std::string* md_instrument) {
+  if (md_instrument != NULL) {
+    
+  } else {
+    
+  }
+  md_instrument_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), md_instrument);
+  // @@protoc_insertion_point(field_set_allocated:MD_Info.MD_Instrument)
 }
 
 #ifdef __GNUC__

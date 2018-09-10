@@ -357,29 +357,29 @@ string CAgent::GetTimer(){
 
 void CAgent::Start_MD_ZMQ_Server(){
 	MD_ZMQ_Context = zmq_ctx_new();
-	MD_ZMQ_Responder = zmq_socket(MD_ZMQ_Context, ZMQ_REP);
+	MD_ZMQ_Publisher = zmq_socket(MD_ZMQ_Context, ZMQ_PUB);
 	string IPC_pipe_name = "ipc:///tmp/md" + instrument_md_pipe_name;
 	cerr<<IPC_pipe_name<<endl;
-	int rc = zmq_bind(MD_ZMQ_Responder, IPC_pipe_name.c_str());
+	int rc = zmq_bind(MD_ZMQ_Publisher, IPC_pipe_name.c_str());
 	assert(rc == 0);
 
 	// need set the machinesm well in this section
-	char buff[100];
-	zmq_msg_t request;
-	zmq_msg_t reply;
+	//char buff[100];
+	//zmq_msg_t request;
+	//zmq_msg_t reply;
 
-	string proto_buffer;
+	//string proto_buffer;
 
-	printf("waiting PyMD required\n");
+	//printf("waiting PyMD required\n");
 
-	zmq_msg_init_size(&request,100);
-	int size = zmq_msg_recv(&request,MD_ZMQ_Responder,0);
-	memset(buff,0,100 * sizeof(char));
-	memcpy(buff,zmq_msg_data(&request),100);
-	ptMD_Info.ParseFromArray(buff,100);
-	if(ptMD_Info.msg_received() == false){
-		bMD_PyReady = true;
-	}
+	//zmq_msg_init_size(&request,100);
+	//int size = zmq_msg_recv(&request,MD_ZMQ_Responder,0);
+	//memset(buff,0,100 * sizeof(char));
+	//memcpy(buff,zmq_msg_data(&request),100);
+	//ptMD_Info.ParseFromArray(buff,100);
+	//if(ptMD_Info.msg_pipe_init() == false){
+	//	bMD_PyReady = true;
+	//}
 
 	//int reply_size = proto_buffer.size();
 	//int ret = zmq_msg_init_size(&reply,100);
@@ -412,7 +412,7 @@ void CAgent::Start_AG_ZMQ_Server(){
 	memset(buff,0,100 * sizeof(char));
 	memcpy(buff,zmq_msg_data(&request),100);
 	ptAG_Info.ParseFromArray(buff,100);
-	if(ptAG_Info.msg_received() == false){
+	if(ptAG_Info.msg_pipe_init() == false){
 		bAG_PyReady = true;
 	}
 
@@ -431,19 +431,19 @@ void CAgent::Broadcast_MD(CThostFtdcDepthMarketDataField *pDepth){
 	ptMD_Info.set_md_timestamp(pDepth->UpdateTime);
 
 	char buff[100];
-	zmq_msg_t request;
-	zmq_msg_t reply;
+	//zmq_msg_t request;
+	zmq_msg_t md_msg;
 
 	string proto_buffer;
 	ptMD_Info.SerializeToString(&proto_buffer);
 	
-	int reply_size = proto_buffer.size();
-	int ret = zmq_msg_init_size(&reply,100);
-	memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
-	zmq_msg_send(&reply,MD_ZMQ_Responder,0);
+	int md_msg_size = proto_buffer.size();
+	int ret = zmq_msg_init_size(&md_msg,100);
+	memcpy(zmq_msg_data(&md_msg),proto_buffer.c_str(),md_msg_size);
+	zmq_msg_send(&md_msg,MD_ZMQ_Publisher,0);
 
-	zmq_msg_init_size(&request,100);
-	int size = zmq_msg_recv(&request,MD_ZMQ_Responder,0);
+	//zmq_msg_init_size(&request,100);
+	//int size = zmq_msg_recv(&request,MD_ZMQ_Responder,0);
 }
 
 
