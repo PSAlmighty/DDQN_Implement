@@ -130,6 +130,8 @@ void *CAgent::SliceCallBack(void *arg){
 		&& !pThis->bStopTrading){
 		//pThis->DQN_Action(pThis->SprDepthData);
 		cerr<<"Heartbeat Working\n";
+		cerr<<pThis->SprDepthData->UpdateTime<<endl;
+		cerr<<pThis->SprDepthData->Volume<<endl;
 		cerr<<pThis->SprDepthData->LastPrice<<endl;
 		if(pThis->bMD_PyReady)
 			pThis->Broadcast_MD(pThis->SprDepthData);
@@ -426,6 +428,7 @@ void CAgent::Start_AG_ZMQ_Server(){
 void CAgent::Broadcast_MD(CThostFtdcDepthMarketDataField *pDepth){
 	ptMD_Info.set_last_price(pDepth->LastPrice);
 	ptMD_Info.set_volume(pDepth->Volume);
+	ptMD_Info.set_md_timestamp(pDepth->UpdateTime);
 
 	char buff[100];
 	zmq_msg_t request;
@@ -438,6 +441,9 @@ void CAgent::Broadcast_MD(CThostFtdcDepthMarketDataField *pDepth){
 	int ret = zmq_msg_init_size(&reply,100);
 	memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
 	zmq_msg_send(&reply,MD_ZMQ_Responder,0);
+
+	zmq_msg_init_size(&request,100);
+	int size = zmq_msg_recv(&request,MD_ZMQ_Responder,0);
 }
 
 

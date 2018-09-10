@@ -94,6 +94,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::MD_Info, last_price_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::MD_Info, volume_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::MD_Info, msg_received_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::MD_Info, md_timestamp_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::Agent_Info)},
@@ -131,12 +132,13 @@ void AddDescriptorsImpl() {
       "t_Action\030\001 \001(\007\022\030\n\020Current_Position\030\002 \001(\007"
       "\022 \n\030Agent_Trading_Instrument\030\003 \001(\t\022\030\n\020Ac"
       "tion_Timestamp\030\004 \001(\t\022\024\n\014LatestResult\030\005 \001"
-      "(\010\022\024\n\014msg_received\030\006 \001(\010\"C\n\007MD_Info\022\022\n\nl"
+      "(\010\022\024\n\014msg_received\030\006 \001(\010\"Y\n\007MD_Info\022\022\n\nl"
       "ast_price\030\001 \001(\001\022\016\n\006volume\030\002 \001(\007\022\024\n\014msg_r"
-      "eceived\030\003 \001(\010b\006proto3"
+      "eceived\030\003 \001(\010\022\024\n\014MD_Timestamp\030\004 \001(\tb\006pro"
+      "to3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 261);
+      descriptor, 283);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "DQN_Agent.proto", &protobuf_RegisterTypes);
 }
@@ -619,6 +621,7 @@ void MD_Info::InitAsDefaultInstance() {
 const int MD_Info::kLastPriceFieldNumber;
 const int MD_Info::kVolumeFieldNumber;
 const int MD_Info::kMsgReceivedFieldNumber;
+const int MD_Info::kMDTimestampFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 MD_Info::MD_Info()
@@ -634,6 +637,10 @@ MD_Info::MD_Info(const MD_Info& from)
       _internal_metadata_(NULL),
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  md_timestamp_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.md_timestamp().size() > 0) {
+    md_timestamp_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.md_timestamp_);
+  }
   ::memcpy(&last_price_, &from.last_price_,
     static_cast<size_t>(reinterpret_cast<char*>(&msg_received_) -
     reinterpret_cast<char*>(&last_price_)) + sizeof(msg_received_));
@@ -641,6 +648,7 @@ MD_Info::MD_Info(const MD_Info& from)
 }
 
 void MD_Info::SharedCtor() {
+  md_timestamp_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&last_price_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&msg_received_) -
       reinterpret_cast<char*>(&last_price_)) + sizeof(msg_received_));
@@ -653,6 +661,7 @@ MD_Info::~MD_Info() {
 }
 
 void MD_Info::SharedDtor() {
+  md_timestamp_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void MD_Info::SetCachedSize(int size) const {
@@ -684,6 +693,7 @@ void MD_Info::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  md_timestamp_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&last_price_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&msg_received_) -
       reinterpret_cast<char*>(&last_price_)) + sizeof(msg_received_));
@@ -742,6 +752,22 @@ bool MD_Info::MergePartialFromCodedStream(
         break;
       }
 
+      // string MD_Timestamp = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_md_timestamp()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->md_timestamp().data(), static_cast<int>(this->md_timestamp().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "MD_Info.MD_Timestamp"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -783,6 +809,16 @@ void MD_Info::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->msg_received(), output);
   }
 
+  // string MD_Timestamp = 4;
+  if (this->md_timestamp().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->md_timestamp().data(), static_cast<int>(this->md_timestamp().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "MD_Info.MD_Timestamp");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->md_timestamp(), output);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
@@ -812,6 +848,17 @@ void MD_Info::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->msg_received(), target);
   }
 
+  // string MD_Timestamp = 4;
+  if (this->md_timestamp().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->md_timestamp().data(), static_cast<int>(this->md_timestamp().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "MD_Info.MD_Timestamp");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->md_timestamp(), target);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
@@ -829,6 +876,13 @@ size_t MD_Info::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
+  // string MD_Timestamp = 4;
+  if (this->md_timestamp().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->md_timestamp());
+  }
+
   // double last_price = 1;
   if (this->last_price() != 0) {
     total_size += 1 + 8;
@@ -873,6 +927,10 @@ void MD_Info::MergeFrom(const MD_Info& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.md_timestamp().size() > 0) {
+
+    md_timestamp_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.md_timestamp_);
+  }
   if (from.last_price() != 0) {
     set_last_price(from.last_price());
   }
@@ -908,6 +966,7 @@ void MD_Info::Swap(MD_Info* other) {
 }
 void MD_Info::InternalSwap(MD_Info* other) {
   using std::swap;
+  md_timestamp_.Swap(&other->md_timestamp_);
   swap(last_price_, other->last_price_);
   swap(volume_, other->volume_);
   swap(msg_received_, other->msg_received_);

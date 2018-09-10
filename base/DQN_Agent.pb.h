@@ -292,6 +292,20 @@ class MD_Info : public ::google::protobuf::Message /* @@protoc_insertion_point(c
 
   // accessors -------------------------------------------------------
 
+  // string MD_Timestamp = 4;
+  void clear_md_timestamp();
+  static const int kMDTimestampFieldNumber = 4;
+  const ::std::string& md_timestamp() const;
+  void set_md_timestamp(const ::std::string& value);
+  #if LANG_CXX11
+  void set_md_timestamp(::std::string&& value);
+  #endif
+  void set_md_timestamp(const char* value);
+  void set_md_timestamp(const char* value, size_t size);
+  ::std::string* mutable_md_timestamp();
+  ::std::string* release_md_timestamp();
+  void set_allocated_md_timestamp(::std::string* md_timestamp);
+
   // double last_price = 1;
   void clear_last_price();
   static const int kLastPriceFieldNumber = 1;
@@ -314,6 +328,7 @@ class MD_Info : public ::google::protobuf::Message /* @@protoc_insertion_point(c
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr md_timestamp_;
   double last_price_;
   ::google::protobuf::uint32 volume_;
   bool msg_received_;
@@ -538,6 +553,59 @@ inline void MD_Info::set_msg_received(bool value) {
   
   msg_received_ = value;
   // @@protoc_insertion_point(field_set:MD_Info.msg_received)
+}
+
+// string MD_Timestamp = 4;
+inline void MD_Info::clear_md_timestamp() {
+  md_timestamp_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& MD_Info::md_timestamp() const {
+  // @@protoc_insertion_point(field_get:MD_Info.MD_Timestamp)
+  return md_timestamp_.GetNoArena();
+}
+inline void MD_Info::set_md_timestamp(const ::std::string& value) {
+  
+  md_timestamp_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:MD_Info.MD_Timestamp)
+}
+#if LANG_CXX11
+inline void MD_Info::set_md_timestamp(::std::string&& value) {
+  
+  md_timestamp_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:MD_Info.MD_Timestamp)
+}
+#endif
+inline void MD_Info::set_md_timestamp(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  md_timestamp_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:MD_Info.MD_Timestamp)
+}
+inline void MD_Info::set_md_timestamp(const char* value, size_t size) {
+  
+  md_timestamp_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:MD_Info.MD_Timestamp)
+}
+inline ::std::string* MD_Info::mutable_md_timestamp() {
+  
+  // @@protoc_insertion_point(field_mutable:MD_Info.MD_Timestamp)
+  return md_timestamp_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* MD_Info::release_md_timestamp() {
+  // @@protoc_insertion_point(field_release:MD_Info.MD_Timestamp)
+  
+  return md_timestamp_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void MD_Info::set_allocated_md_timestamp(::std::string* md_timestamp) {
+  if (md_timestamp != NULL) {
+    
+  } else {
+    
+  }
+  md_timestamp_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), md_timestamp);
+  // @@protoc_insertion_point(field_set_allocated:MD_Info.MD_Timestamp)
 }
 
 #ifdef __GNUC__

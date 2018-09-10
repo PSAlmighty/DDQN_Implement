@@ -12,4 +12,5 @@ message MD_Info{
 	double last_price = 1;
 	fixed32 volume = 2;
 	bool msg_received = 3;
+	string MD_Timestamp = 4;
 };
