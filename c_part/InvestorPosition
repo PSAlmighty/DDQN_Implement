@@ -1972,3 +1972,75 @@
  --->>> Net Position£º 39
  --->>> Direciton£ºLong 
 -----------------------------------------
+ --->>> Instrument       £º IF1809
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º -704820
+ --->>> Net Position£º 95
+ --->>> Direciton£ºLong 
+-----------------------------------------
+ --->>> Instrument       £º sc1812
+ --->>> Realized   Profit£º 172000
+ --->>> Unrealized Profit£º 0
+ --->>> Net Position£º 0
+ --->>> Direciton£ºLong 
+-----------------------------------------
+ --->>> Instrument       £º sc1812
+ --->>> Realized   Profit£º -615400
+ --->>> Unrealized Profit£º 29400
+ --->>> Net Position£º 50
+ --->>> Direciton£ºShort 
+-----------------------------------------
+ --->>> Instrument       £º zn1812
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º -1200
+ --->>> Net Position£º 16
+ --->>> Direciton£ºShort 
+-----------------------------------------
+ --->>> Instrument       £º sc1812
+ --->>> Realized   Profit£º -5000
+ --->>> Unrealized Profit£º 0
+ --->>> Net Position£º 0
+ --->>> Direciton£ºShort 
+-----------------------------------------
+ --->>> Instrument       £º sc1812
+ --->>> Realized   Profit£º -40000
+ --->>> Unrealized Profit£º 0
+ --->>> Net Position£º 0
+ --->>> Direciton£ºLong 
+-----------------------------------------
+ --->>> Instrument       £º fu1905
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º -120750
+ --->>> Net Position£º 525
+ --->>> Direciton£ºShort 
+-----------------------------------------
+ --->>> Instrument       £º fu1901
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º 94500
+ --->>> Net Position£º 525
+ --->>> Direciton£ºLong 
+-----------------------------------------
+ --->>> Instrument       £º cu1811
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º 105600
+ --->>> Net Position£º 352
+ --->>> Direciton£ºShort 
+-----------------------------------------
+ --->>> Instrument       £º au1812
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º -370500
+ --->>> Net Position£º 570
+ --->>> Direciton£ºLong 
+-----------------------------------------
+ --->>> Instrument       £º IF1810
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º 97020
+ --->>> Net Position£º 11
+ --->>> Direciton£ºShort 
+-----------------------------------------
+ --->>> Instrument       £º IF1809
+ --->>> Realized   Profit£º -8760
+ --->>> Unrealized Profit£º -342000
+ --->>> Net Position£º 38
+ --->>> Direciton£ºLong 
+-----------------------------------------

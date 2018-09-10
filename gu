@@ -1,8 +1,0 @@
-#!/bin/bash
-
-git pull
-git status
-git add *
-git rm -r --cached ./py_part/model
-git commit -m "$1" 
-git push origin master
