@@ -429,6 +429,7 @@ void CAgent::Broadcast_MD(CThostFtdcDepthMarketDataField *pDepth){
 	ptMD_Info.set_volume(pDepth->Volume);
 	ptMD_Info.set_md_timestamp(pDepth->UpdateTime);
 	ptMD_Info.set_md_instrument(pDepth->InstrumentID);
+	ptMD_Info.set_md_tradingday(pDepth->TradingDay);
 
 	char buff[100];
 	//zmq_msg_t request;

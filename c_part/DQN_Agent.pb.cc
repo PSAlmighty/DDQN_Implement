@@ -96,6 +96,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::MD_Info, msg_pipe_init_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::MD_Info, md_timestamp_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::MD_Info, md_instrument_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::MD_Info, md_tradingday_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::Agent_Info)},
@@ -133,13 +134,14 @@ void AddDescriptorsImpl() {
       "t_Action\030\001 \001(\007\022\030\n\020Current_Position\030\002 \001(\007"
       "\022 \n\030Agent_Trading_Instrument\030\003 \001(\t\022\030\n\020Ac"
       "tion_Timestamp\030\004 \001(\t\022\024\n\014LatestResult\030\005 \001"
-      "(\010\022\025\n\rmsg_pipe_init\030\006 \001(\010\"q\n\007MD_Info\022\022\n\n"
-      "last_price\030\001 \001(\001\022\016\n\006volume\030\002 \001(\007\022\025\n\rmsg_"
-      "pipe_init\030\003 \001(\010\022\024\n\014MD_Timestamp\030\004 \001(\t\022\025\n"
-      "\rMD_Instrument\030\005 \001(\tb\006proto3"
+      "(\010\022\025\n\rmsg_pipe_init\030\006 \001(\010\"\210\001\n\007MD_Info\022\022\n"
+      "\nlast_price\030\001 \001(\001\022\016\n\006volume\030\002 \001(\007\022\025\n\rmsg"
+      "_pipe_init\030\003 \001(\010\022\024\n\014MD_Timestamp\030\004 \001(\t\022\025"
+      "\n\rMD_Instrument\030\005 \001(\t\022\025\n\rMD_TradingDay\030\006"
+      " \001(\tb\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 308);
+      descriptor, 332);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "DQN_Agent.proto", &protobuf_RegisterTypes);
 }
@@ -624,6 +626,7 @@ const int MD_Info::kVolumeFieldNumber;
 const int MD_Info::kMsgPipeInitFieldNumber;
 const int MD_Info::kMDTimestampFieldNumber;
 const int MD_Info::kMDInstrumentFieldNumber;
+const int MD_Info::kMDTradingDayFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 MD_Info::MD_Info()
@@ -647,6 +650,10 @@ MD_Info::MD_Info(const MD_Info& from)
   if (from.md_instrument().size() > 0) {
     md_instrument_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.md_instrument_);
   }
+  md_tradingday_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.md_tradingday().size() > 0) {
+    md_tradingday_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.md_tradingday_);
+  }
   ::memcpy(&last_price_, &from.last_price_,
     static_cast<size_t>(reinterpret_cast<char*>(&msg_pipe_init_) -
     reinterpret_cast<char*>(&last_price_)) + sizeof(msg_pipe_init_));
@@ -656,6 +663,7 @@ MD_Info::MD_Info(const MD_Info& from)
 void MD_Info::SharedCtor() {
   md_timestamp_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   md_instrument_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  md_tradingday_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&last_price_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&msg_pipe_init_) -
       reinterpret_cast<char*>(&last_price_)) + sizeof(msg_pipe_init_));
@@ -670,6 +678,7 @@ MD_Info::~MD_Info() {
 void MD_Info::SharedDtor() {
   md_timestamp_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   md_instrument_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  md_tradingday_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void MD_Info::SetCachedSize(int size) const {
@@ -703,6 +712,7 @@ void MD_Info::Clear() {
 
   md_timestamp_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   md_instrument_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  md_tradingday_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&last_price_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&msg_pipe_init_) -
       reinterpret_cast<char*>(&last_price_)) + sizeof(msg_pipe_init_));
@@ -793,6 +803,22 @@ bool MD_Info::MergePartialFromCodedStream(
         break;
       }
 
+      // string MD_TradingDay = 6;
+      case 6: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(50u /* 50 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_md_tradingday()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->md_tradingday().data(), static_cast<int>(this->md_tradingday().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "MD_Info.MD_TradingDay"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -854,6 +880,16 @@ void MD_Info::SerializeWithCachedSizes(
       5, this->md_instrument(), output);
   }
 
+  // string MD_TradingDay = 6;
+  if (this->md_tradingday().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->md_tradingday().data(), static_cast<int>(this->md_tradingday().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "MD_Info.MD_TradingDay");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      6, this->md_tradingday(), output);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
@@ -905,6 +941,17 @@ void MD_Info::SerializeWithCachedSizes(
         5, this->md_instrument(), target);
   }
 
+  // string MD_TradingDay = 6;
+  if (this->md_tradingday().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->md_tradingday().data(), static_cast<int>(this->md_tradingday().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "MD_Info.MD_TradingDay");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        6, this->md_tradingday(), target);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
@@ -934,6 +981,13 @@ size_t MD_Info::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->md_instrument());
+  }
+
+  // string MD_TradingDay = 6;
+  if (this->md_tradingday().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->md_tradingday());
   }
 
   // double last_price = 1;
@@ -988,6 +1042,10 @@ void MD_Info::MergeFrom(const MD_Info& from) {
 
     md_instrument_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.md_instrument_);
   }
+  if (from.md_tradingday().size() > 0) {
+
+    md_tradingday_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.md_tradingday_);
+  }
   if (from.last_price() != 0) {
     set_last_price(from.last_price());
   }
@@ -1025,6 +1083,7 @@ void MD_Info::InternalSwap(MD_Info* other) {
   using std::swap;
   md_timestamp_.Swap(&other->md_timestamp_);
   md_instrument_.Swap(&other->md_instrument_);
+  md_tradingday_.Swap(&other->md_tradingday_);
   swap(last_price_, other->last_price_);
   swap(volume_, other->volume_);
   swap(msg_pipe_init_, other->msg_pipe_init_);
