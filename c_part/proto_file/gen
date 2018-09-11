@@ -4,4 +4,4 @@ protoc --cpp_out=. DQN_Agent.proto
 protoc --python_out=. DQN_Agent.proto
 
 mv *.pb.* ..
-mv *.py /AI/CTP_E/Py_Opponent
+mv *.py /AI/CTP_E/py_part
