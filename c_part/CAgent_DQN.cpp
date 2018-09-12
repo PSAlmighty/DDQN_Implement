@@ -152,12 +152,19 @@ void CAgent::Req_DQN_Action(CThostFtdcDepthMarketDataField * DepthData)
 	else
 		CloseOffSetFlag = THOST_FTDC_OF_Close;
 
-	zmq_msg_t request;
-	zmq_msg_init_size(&request,200);
-	int size = zmq_msg_recv(&request,AG_ZMQ_Subscriber,ZMQ_DONTWAIT);
+
 	char buff[200];
+	zmq_msg_t ag_recv_msg;
+	zmq_msg_t ag_req_msg;
+	int ret_recv = zmq_msg_init_size(&ag_recv_msg,200);
+	int ret_req = zmq_msg_init_size(&ag_req_msg,200);
+	
+	memcpy(zmq_msg_data(&ag_req_msg),"ActionRequest",30);
+	zmq_send(&ag_req_msg,AG_ZMQ_Subscriber,0);
+
+	int size = zmq_msg_recv(&ag_recv_msg,AG_ZMQ_Subscriber,ZMQ_DONTWAIT);
 	memset(buff,0,200*sizeof(char));
-	memcpy(buff,zmq_msg_data(&request),200);
+	memcpy(buff,zmq_msg_data(&ag_recv_msg),200);
 	ptAG_Info.ParseFromArray(buff,200);
 	cerr<<"Agent Action: "<<ptAG_Info.agent_action()<<endl;
 	memset(buff,0,100*sizeof(char));
@@ -342,11 +349,11 @@ void CAgent::Start_MD_ZMQ_Server(){
 
 void CAgent::Start_AG_ZMQ_Server(){
 	AG_ZMQ_Context = zmq_ctx_new();
-	AG_ZMQ_Subscriber = zmq_socket(AG_ZMQ_Context, ZMQ_SUB);
+	AG_ZMQ_Subscriber = zmq_socket(AG_ZMQ_Context, ZMQ_REQ);
 	string IPC_pipe_name = "ipc:///tmp/" + instrument_ag_pipe_name;
 	cerr<<IPC_pipe_name<<endl;
 	int rc = zmq_connect(AG_ZMQ_Subscriber, IPC_pipe_name.c_str());
-	zmq_setsockopt(AG_ZMQ_Subscriber,ZMQ_SUBSCRIBE,"",0);
+	//zmq_setsockopt(AG_ZMQ_Subscriber,ZMQ_SUBSCRIBE,"",0);
 	assert(rc == 0);
 }
 
