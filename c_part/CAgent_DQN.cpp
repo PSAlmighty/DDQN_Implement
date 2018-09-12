@@ -334,7 +334,7 @@ string CAgent::GetTimer(){
 void CAgent::Start_MD_ZMQ_Server(){
 	MD_ZMQ_Context = zmq_ctx_new();
 	MD_ZMQ_Publisher = zmq_socket(MD_ZMQ_Context, ZMQ_PUB);
-	string IPC_pipe_name = "ipc:///tmp/md" + instrument_md_pipe_name;
+	string IPC_pipe_name = "ipc:///tmp/" + instrument_md_pipe_name;
 	cerr<<IPC_pipe_name<<endl;
 	int rc = zmq_bind(MD_ZMQ_Publisher, IPC_pipe_name.c_str());
 	assert(rc == 0);
@@ -343,7 +343,7 @@ void CAgent::Start_MD_ZMQ_Server(){
 void CAgent::Start_AG_ZMQ_Server(){
 	AG_ZMQ_Context = zmq_ctx_new();
 	AG_ZMQ_Subscriber = zmq_socket(AG_ZMQ_Context, ZMQ_SUB);
-	string IPC_pipe_name = "ipc:///tmp/ag" + instrument_md_pipe_name;
+	string IPC_pipe_name = "ipc:///tmp/" + instrument_ag_pipe_name;
 	cerr<<IPC_pipe_name<<endl;
 	int rc = zmq_connect(AG_ZMQ_Subscriber, IPC_pipe_name.c_str());
 	zmq_setsockopt(AG_ZMQ_Subscriber,ZMQ_SUBSCRIBE,"",0);
