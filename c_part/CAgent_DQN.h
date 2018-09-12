@@ -57,7 +57,7 @@ public:
 private:
 
 	void CalculatePnL(CThostFtdcDepthMarketDataField *DepthData);
-	void DQN_Action(CThostFtdcDepthMarketDataField *DepthData);
+	void Req_DQN_Action(CThostFtdcDepthMarketDataField *DepthData);
 	void CleanPosition(CThostFtdcDepthMarketDataField *DepthData);
 	void PendingOrder(CThostFtdcDepthMarketDataField *DepthData, double, int, char, char);
 
@@ -93,7 +93,7 @@ private:
 	void *MD_ZMQ_Context;
 	void *MD_ZMQ_Publisher;
 	void *AG_ZMQ_Context;
-	void *AG_ZMQ_Responder;
+	void *AG_ZMQ_Subscriber;
 
 	Agent_Info ptAG_Info;
 	MD_Info ptMD_Info;

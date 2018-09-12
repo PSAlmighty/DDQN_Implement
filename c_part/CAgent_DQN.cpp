@@ -71,6 +71,7 @@ CAgent::CAgent(string _ID,string _md_pipe_name,string _ag_pipe_name){
 	pthread_mutex_init(&csInstrumentUnfillOrderLock,NULL);
 
 	Start_MD_ZMQ_Server();
+	Start_AG_ZMQ_Server();
 }
 
 CAgent::~CAgent(){
@@ -134,6 +135,7 @@ void *CAgent::SliceCallBack(void *arg){
 		cerr<<pThis->SprDepthData->Volume<<endl;
 		cerr<<pThis->SprDepthData->LastPrice<<endl;
 		pThis->Broadcast_MD(pThis->SprDepthData);
+		pThis->Req_DQN_Action(pThis->SprDepthData);
 	}
 
 	pThis->CalculatePnL(pThis->SprDepthData);
@@ -142,48 +144,23 @@ void *CAgent::SliceCallBack(void *arg){
 	return NULL;
 }
 
-void CAgent::DQN_Action(CThostFtdcDepthMarketDataField * DepthData)
+void CAgent::Req_DQN_Action(CThostFtdcDepthMarketDataField * DepthData)
 {
-	pthread_mutex_lock(&csInstrumentUnfillFlagLock);
-
 	char CloseOffSetFlag;
 	if (InstrumentExchangeID == "SHFE")
 		CloseOffSetFlag = THOST_FTDC_OF_CloseToday;
 	else
 		CloseOffSetFlag = THOST_FTDC_OF_Close;
 
-
-	ptAG_Info.set_agent_action(88);
-
-	int i = 1;
-	//while(1){
-	//ptAG_Info.set_agent_action(i++);
-	//string proto_buffer;
-	//ptAG_Info.SerializeToString(&proto_buffer);
-
-	//printf("waiting\n");
-
-	//zmq_msg_t request;
-	//zmq_msg_init_size(&request,100);
-	//int size = zmq_msg_recv(&request,ZMQ_Responder,0);
-	//char buff[100];
-	//memset(buff,0,100*sizeof(char));
-	//memcpy(buff,zmq_msg_data(&request),100);
-	//ptAG_Info.ParseFromArray(buff,100);
-	//cerr<<"Agent Action: "<<ptAG_Info.agent_action()<<endl;
-	//memset(buff,0,100*sizeof(char));
-
-	//zmq_msg_t reply;
-	//int reply_size = proto_buffer.size();
-	//int ret = zmq_msg_init_size(&reply,100);
-	//memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
-	//zmq_msg_send(&reply,ZMQ_Responder,0);
-	//}
-
-	//binzmq_close(ZMQ_Responder);
-	//zmq_ctx_destroy(ZMQ_Context);
-
-	pthread_mutex_unlock(&csInstrumentUnfillFlagLock);
+	zmq_msg_t request;
+	zmq_msg_init_size(&request,200);
+	int size = zmq_msg_recv(&request,AG_ZMQ_Subscriber,ZMQ_DONTWAIT);
+	char buff[200];
+	memset(buff,0,200*sizeof(char));
+	memcpy(buff,zmq_msg_data(&request),200);
+	ptAG_Info.ParseFromArray(buff,200);
+	cerr<<"Agent Action: "<<ptAG_Info.agent_action()<<endl;
+	memset(buff,0,100*sizeof(char));
 }
 
 void CAgent::PendingOrder(CThostFtdcDepthMarketDataField *DepthData, double price, int lots, char offlag, char direction)
@@ -361,67 +338,16 @@ void CAgent::Start_MD_ZMQ_Server(){
 	cerr<<IPC_pipe_name<<endl;
 	int rc = zmq_bind(MD_ZMQ_Publisher, IPC_pipe_name.c_str());
 	assert(rc == 0);
-
-	// need set the machinesm well in this section
-	//char buff[100];
-	//zmq_msg_t request;
-	//zmq_msg_t reply;
-
-	//string proto_buffer;
-
-	//printf("waiting PyMD required\n");
-
-	//zmq_msg_init_size(&request,100);
-	//int size = zmq_msg_recv(&request,MD_ZMQ_Responder,0);
-	//memset(buff,0,100 * sizeof(char));
-	//memcpy(buff,zmq_msg_data(&request),100);
-	//ptMD_Info.ParseFromArray(buff,100);
-	//if(ptMD_Info.msg_pipe_init() == false){
-	//	bMD_PyReady = true;
-	//}
-
-	//int reply_size = proto_buffer.size();
-	//int ret = zmq_msg_init_size(&reply,100);
-	//memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
-	//zmq_msg_send(&reply,ZMQ_Responder,0);
-
-	//zmq_close(ZMQ_Responder);
-	//zmq_ctx_destroy(ZMQ_Context);
 }
 
 void CAgent::Start_AG_ZMQ_Server(){
 	AG_ZMQ_Context = zmq_ctx_new();
-	AG_ZMQ_Responder = zmq_socket(AG_ZMQ_Context, ZMQ_REP);
-	string IPC_pipe_name = "ipc:///tmp/md" + instrument_md_pipe_name;
+	AG_ZMQ_Subscriber = zmq_socket(AG_ZMQ_Context, ZMQ_SUB);
+	string IPC_pipe_name = "ipc:///tmp/ag" + instrument_md_pipe_name;
 	cerr<<IPC_pipe_name<<endl;
-	int rc = zmq_bind(AG_ZMQ_Responder, IPC_pipe_name.c_str());
+	int rc = zmq_connect(AG_ZMQ_Subscriber, IPC_pipe_name.c_str());
+	zmq_setsockopt(AG_ZMQ_Subscriber,ZMQ_SUBSCRIBE,"",0);
 	assert(rc == 0);
-
-	// need set the machinesm well in this section
-	char buff[100];
-	zmq_msg_t request;
-	zmq_msg_t reply;
-
-	string proto_buffer;
-
-	printf("waiting PyAG required\n");
-
-	zmq_msg_init_size(&request,100);
-	int size = zmq_msg_recv(&request,AG_ZMQ_Responder,0);
-	memset(buff,0,100 * sizeof(char));
-	memcpy(buff,zmq_msg_data(&request),100);
-	ptAG_Info.ParseFromArray(buff,100);
-	if(ptAG_Info.msg_pipe_init() == false){
-		bAG_PyReady = true;
-	}
-
-	//int reply_size = proto_buffer.size();
-	//int ret = zmq_msg_init_size(&reply,100);
-	//memcpy(zmq_msg_data(&reply),proto_buffer.c_str(),reply_size);
-	//zmq_msg_send(&reply,ZMQ_Responder,0);
-
-	//zmq_close(ZMQ_Responder);
-	//zmq_ctx_destroy(ZMQ_Context);
 }
 
 void CAgent::Broadcast_MD(CThostFtdcDepthMarketDataField *pDepth){
@@ -439,8 +365,8 @@ void CAgent::Broadcast_MD(CThostFtdcDepthMarketDataField *pDepth){
 	ptMD_Info.SerializeToString(&proto_buffer);
 	
 	int md_msg_size = proto_buffer.size();
-	int ret = zmq_msg_init_size(&md_msg,100);
-	memcpy(zmq_msg_data(&md_msg),proto_buffer.c_str(),md_msg_size);
+	int ret = zmq_msg_init_size(&md_msg,200);
+	memcpy(zmq_msg_data(&md_msg),proto_buffer.c_str(),md_msg_size + 10);
 	zmq_msg_send(&md_msg,MD_ZMQ_Publisher,0);
 
 	//zmq_msg_init_size(&request,100);
