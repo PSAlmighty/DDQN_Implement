@@ -2764,3 +2764,63 @@
  --->>> Net Position£º 1
  --->>> Direciton£ºShort 
 -----------------------------------------
+ --->>> Instrument       £º IF1809
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º -162540
+ --->>> Net Position£º 38
+ --->>> Direciton£ºLong 
+-----------------------------------------
+ --->>> Instrument       £º sc1812
+ --->>> Realized   Profit£º 1.387e+06
+ --->>> Unrealized Profit£º 1.148e+06
+ --->>> Net Position£º 80
+ --->>> Direciton£ºLong 
+-----------------------------------------
+ --->>> Instrument       £º zn1812
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º 14800
+ --->>> Net Position£º 16
+ --->>> Direciton£ºShort 
+-----------------------------------------
+ --->>> Instrument       £º fu1905
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º -362250
+ --->>> Net Position£º 525
+ --->>> Direciton£ºShort 
+-----------------------------------------
+ --->>> Instrument       £º fu1901
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º 383250
+ --->>> Net Position£º 525
+ --->>> Direciton£ºLong 
+-----------------------------------------
+ --->>> Instrument       £º cu1811
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º 35200
+ --->>> Net Position£º 352
+ --->>> Direciton£ºShort 
+-----------------------------------------
+ --->>> Instrument       £º au1812
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º 85500
+ --->>> Net Position£º 570
+ --->>> Direciton£ºLong 
+-----------------------------------------
+ --->>> Instrument       £º IF1810
+ --->>> Realized   Profit£º 0
+ --->>> Unrealized Profit£º 50160
+ --->>> Net Position£º 11
+ --->>> Direciton£ºShort 
+-----------------------------------------
+ --->>> Instrument       £º IF1809
+ --->>> Realized   Profit£º 1200
+ --->>> Unrealized Profit£º -135000
+ --->>> Net Position£º 30
+ --->>> Direciton£ºLong 
+-----------------------------------------
+ --->>> Instrument       £º IF1809
+ --->>> Realized   Profit£º 2940
+ --->>> Unrealized Profit£º 0
+ --->>> Net Position£º 0
+ --->>> Direciton£ºShort 
+-----------------------------------------
