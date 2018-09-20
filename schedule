@@ -1,0 +1,5 @@
+05 15 * * 1,2,3,4,5 kill -9 $(pidof CTP_Agent)
+05 1  * * 1,2,3,4,5 kill -9 $(pidof CTP_Agent)
+55 20 * * * 1,2,3,4,5 cd /AI/CTP_E/c_part && ./r  > ./ctp_agent_output 
+55 8 * * * 1,2,3,4,5 cd /AI/CTP_E/c_part && ./r  > ./ctp_agent_output 
+#*/1 * * * 1,2,3,4,5 cd /AI/CTP_E/c_part 

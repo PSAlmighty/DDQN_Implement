@@ -1,5 +1,5 @@
 #!/bin/bash
-make 
-make clean
-./CTP_Agent 66666 103201168 094519 > output
+make > /dev/null 
+make clean > /dev/null
+./CTP_Agent 66666 103201168 094519 
 
